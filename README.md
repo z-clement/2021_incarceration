@@ -1,7 +1,7 @@
 # Team Name
 
 ### Team Members
-
+1. Sarah Peters
 ### Final Proposal
 1. Persona/Scenario
     1. Persona
