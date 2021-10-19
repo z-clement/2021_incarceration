@@ -15,7 +15,8 @@
 
 4. Wireframes
 
-4. Project Ideas
+5. Project Ideas
+
 Map of US, linked maps to each state show statistical data related to local / federal prisons
 
 
