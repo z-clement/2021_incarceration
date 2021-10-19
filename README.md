@@ -2,6 +2,7 @@
 
 ### Team Members
 1. Sarah Peters
+2. Zac Clement
 ### Final Proposal
 1. Persona/Scenario
     1. Persona
