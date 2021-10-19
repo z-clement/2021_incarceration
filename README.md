@@ -1,6 +1,7 @@
 # Team Name
 
 ### Team Members
+2. Rita Sherwood
 
 ### Final Proposal
 1. Persona/Scenario
