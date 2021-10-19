@@ -12,6 +12,7 @@
     Map of US, linked maps to each state show statistical data related to local / federal prisons
 
 3. Objectives & Motivation3. Objectives & Motivation
+3. Objectives & Motivation
 The topic of our intended app is presenting incarceration data for the United States, by state, with data drawn from the Census of Jails:
 
  https://bjs.ojp.gov/library/publications/census-jails-2005-2019-statistical-tables
