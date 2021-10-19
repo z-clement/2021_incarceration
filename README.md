@@ -1,6 +1,7 @@
 # Team Name
 
 ### Team Members
+1. Zac Clement
 
 ### Final Proposal
 1. Persona/Scenario
