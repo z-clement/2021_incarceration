@@ -1,4 +1,4 @@
-State,total_inmate,inmate_pct_white,inmate_pct_black,inmate_pct_hispanic,inmate_pct_native_indian,inmate_pct_asian,inmate_pct_islander,inmate_pct_two_race
+State,total_inmates,inmates_pct_white,inmates_pct_black,inmates_pct_hispanic,inmates_pct_native_indian,inmates_pct_asian,inmates_pct_islander,inmates_pct_two_race
 Total,"734,470",49.4,33.6,14.6,1.4,0.6,0.1,0.3
 Maine,"1,620",84.2,11.1,3.1,1.1,0.4,^,0.1
 Massachusetts,"9,260",43.1,25.8,28.9,0.3,1.6,^,0.4

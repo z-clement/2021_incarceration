@@ -1,4 +1,4 @@
-State,total_inmate,inmates_citizen,inmates_non_citizen,inmates_unknown,inmates_pct_citizen,inmates_pct_non_citizen,inmates_pct_unknown
+State,total_inmates,inmates_citizen,inmates_non_citizen,inmates_unknown,inmates_pct_citizen,inmates_pct_non_citizen,inmates_pct_unknown
 Total,"734,470","572,830","39,630","122,010",78,5.4,16.6
 Maine,"1,620","1,620",^,10,99.6,0.1,0.3
 Massachusetts,"9,260","6,610",710,"1,940",71.4,7.7,21
