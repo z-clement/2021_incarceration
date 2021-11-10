@@ -1,5 +1,10 @@
 //insert code here!
 window.onload = function() {
+    renderMap();
+}
+
+// function to draw all the state borders
+function renderMap() {
     let width = 1000;
     let height = 500;
 
@@ -32,6 +37,4 @@ window.onload = function() {
             .style("stroke-width", "1")
             .style("fill", "white");
     });
-
-
 }
