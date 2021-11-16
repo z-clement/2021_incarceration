@@ -4,6 +4,8 @@ window.onload = function() {
     renderNationalCharts();
 }
 
+var statesClicked = 0
+
 // function to draw all the state borders
 function renderMap() {
     let width = 1000;
@@ -61,8 +63,16 @@ function renderMap() {
             .enter()
             .append("path")
             .attr("d", path)
+            .attr("class",function(d){return d.properties.NAME.replace(" ","_")})
             .on("click", function(event, d) {
-                clickState(event, d);
+                if (statesClicked < 2)
+                {
+                    clickState(event, d);
+                }
+                else
+                {
+
+                }
             })
             .style("stroke", "#000")
             .style("stroke-width", "1")
@@ -92,8 +102,22 @@ function renderMap() {
 
 // highlight state on click logic
 function clickState(event, d) {
+    if (statesClicked < 2)
+    {
+
+    }
+    else
+    {
+        console.log("Too many states clicked.")
+    }
+    console.log("clicked:"+statesClicked)
     console.log("click! " + d.properties.NAME); // TODO: highlight state logic
+    d3.select("."+d.properties.NAME.replace(" ","_"))
+    .style("fill","orange");
+    statesClicked += 1
+    console.log("clicked:"+statesClicked)
 }
+
 
 // render the national charts
 function renderNationalCharts() {
