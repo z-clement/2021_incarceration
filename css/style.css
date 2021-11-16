@@ -1,1 +1,8 @@
-/*insert style here*/
+.legend-title {
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+.time-title {
+    font-weight: bold;
+}
