@@ -4,6 +4,8 @@ window.onload = function() {
     renderNationalCharts();
 }
 
+var numStatesClicked = 0
+
 // function to draw all the state borders
 function renderMap() {
     let width = 1000;
@@ -65,6 +67,7 @@ function renderMap() {
             .enter()
             .append("path")
             .attr("d", path)
+            .attr("class", function(d) { return d.properties.NAME.replace(" ", "_") })
             .on("click", function(event, d) {
                 clickState(event, d);
             })
@@ -213,10 +216,39 @@ function makeColorScale(data, key) {
     return colorScale;
 }
 
+
+const statesClicked = [];
 // highlight state on click logic
 function clickState(event, d) {
+
+    var state = d.properties.NAME
+
+    statesClicked.push(state)
+
+    console.log("Current States Selected: " + statesClicked[numStatesClicked] + " and " + statesClicked[numStatesClicked - 1])
+        //console.log(statesClicked);
+        //console.log(numStatesClicked);
+        //console.log(statesClicked[numStatesClicked])
+        //console.log(statesClicked[numStatesClicked-1])
+        //console.log("selection:" + statesClicked[numStatesClicked]);
+    d3.select("." + statesClicked[numStatesClicked].replace(" ", "_"))
+        .style("stroke", "orange")
+        .style("stroke-width", "8px")
+        .style("fill", "#70808080");
+    if (numStatesClicked > 1) {
+        d3.select("." + statesClicked[numStatesClicked - 2].replace(" ", "_"))
+            .style("stroke", "rgb(0,0,0)")
+            .style("stroke-width", "1px")
+            .style("fill", "transparent");
+
+    }
+
+    //console.log("clicked:"+numStatesClicked)
     console.log("click! " + d.properties.NAME); // TODO: highlight state logic
+
+    numStatesClicked += 1
 }
+
 
 // render the national charts
 function renderNationalCharts() {
@@ -232,3 +264,42 @@ function renderStateCharts(state) {
 function renderComparisonCharts(state1, state2) {
 
 }
+
+
+
+/*if (numStatesClicked == 0)
+    {
+        console.log("1: "+statesClicked[numStatesClicked]+"2: "+statesClicked[numStatesClicked+1]) 
+        d3.select("."+state1.replace(" ","_"))
+            .style("fill","orange");
+    }
+    else
+    {
+        var state2 = d.properties.NAME
+        statesClicked.push(state2)
+        if (numStatesClicked == 1)
+        {
+            console.log("1: "+statesClicked[numStatesClicked]+"2: "+statesClicked[numStatesClicked+1])
+            d3.select("."+state2.replace(" ","_"))
+                .style("fill","orange");
+        }
+        else
+        {
+            d3.select("."+state1.replace(" ","_"))
+                .style("fill","transparent");
+            state1 = state2;
+            state2 = d.properties.NAME
+            console.log("1: "+state1+"2: "+state2)
+            d3.select("."+state2.replace(" ","_"))
+                .style("fill","orange");
+        }
+    
+        //console.log("Too many states clicked.")
+    }
+    /*else 
+    {
+        state1 = state2;
+        state2 = d.properties.NAME
+        d3.select("."+state2.replace(" ","_"))
+            .style("fill","orange");
+    */
