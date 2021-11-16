@@ -28,12 +28,12 @@ function renderMap() {
 
     // load in the state data
     let incarcerationData;
-    d3.csv("/data/state_data.csv").then(function(data) {
+    d3.csv("data/state_data.csv").then(function(data) {
         incarcerationData = data;
     })
 
     // load in the geoJSON data
-    d3.json("/data/better-states.json").then(function(data) {
+    d3.json("data/better-states.json").then(function(data) {
         console.log(data);
         console.log(incarcerationData)
 
