@@ -50,7 +50,7 @@ function renderMap() {
                 if (incarcerationState == stateName) {
                     for (let property in incarcerationData[j]) {
                         // add a new property to the geojson state data with the incarceration data
-                        data.features[i][property] = incarcerationData[j][property];
+                        data.features[i][property] = Number(incarcerationData[j][property].replace(/,/g, ''));
                     }
                 }
             }
@@ -76,7 +76,14 @@ function renderMap() {
             })
             .style("stroke", "#000")
             .style("stroke-width", "1")
-            .style("fill", "transparent");
+            .style("fill", function(d) {
+                // get the data value for the overall jail population in 2019
+                let value = d["2019_inmates_in_custody"]
+                if (value) {
+                    // console.log(value);
+                }
+                return "white";
+            });
 
         // add an svg legend
         let legend = d3.select("body").append("svg")
@@ -88,7 +95,7 @@ function renderMap() {
             .attr("height", 10)
             .attr("fill", "salmon");
 
-        // add avg to hold click boxes to change time scale
+        // add svg to hold click boxes to change time scale
         let timeSelector = d3.select("body").append("svg")
             .attr("x", width / 2)
             .attr("y", height + 1)
