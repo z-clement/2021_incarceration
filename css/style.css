@@ -1,1 +1,6 @@
 /*insert style here*/
+#clicked{
+    stroke:orange !important;
+    stroke-width:8px !important;
+    fill:#70808080 !important;
+}

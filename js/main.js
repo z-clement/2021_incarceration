@@ -100,38 +100,93 @@ function renderMap() {
     });
 }
 
-
+//var dict = {}
+//dict[key] = "value"
+//console.log("dict:"+dict)
 const statesClicked = [];
 // highlight state on click logic
+let clicksDict = new Object()
 function clickState(event, d) {
 
     var state = d.properties.NAME
+    console.log(state)
     
-    statesClicked.push(state)
+   /* if (state in clicksDict)
+    {
+        clicksDict[state] +=1
+    }
+    else
+    {
+        clicksDict[state] = 1
+    }
 
-    console.log("Current States Selected: "+statesClicked[numStatesClicked]+" and "+statesClicked[numStatesClicked-1])
-    //console.log(statesClicked);
-    //console.log(numStatesClicked);
-    //console.log(statesClicked[numStatesClicked])
-    //console.log(statesClicked[numStatesClicked-1])
-    //console.log("selection:" + statesClicked[numStatesClicked]);
-        d3.select("."+statesClicked[numStatesClicked].replace(" ","_"))
-            .style("stroke","orange")
-            .style("stroke-width","8px")
-            .style("fill","#70808080");
-        if (numStatesClicked > 1)
-        {
-            d3.select("."+statesClicked[numStatesClicked-2].replace(" ","_"))
+    if (clicksDict[state] %2 == 0)
+    {
+        d3.select("."+state.replace(" ","_"))
                 .style("stroke","rgb(0,0,0)")
                 .style("stroke-width","1px")
                 .style("fill","transparent");
-                
-        }
+        numStatesClicked -= 1;
+        console.log(numStatesClicked)
+    }
+    else
+    {
+    console.log(clicksDict);
+    //var clicked = true
+    console.log(numStatesClicked)*/
+    // if else highlighted or not 
+    if (statesClicked.includes(state))
+    {
+        d3.select("."+state.replace(" ","_"))
+            .attr("id","")
+        statesClicked.splice(statesClicked.indexOf(state),1)
+    }
+    else{
+
+    
+    if (statesClicked.length < 2)
+    {
+        console.log("A:"+statesClicked.length)
+        statesClicked.push(state);
+        d3.select("."+state.replace(" ","_"))
+            .attr("id","clicked")
+
+    }
+    else 
+    {
+        d3.select("."+statesClicked[0].replace(" ","_"))
+            .attr("id","");
+        statesClicked[0] = statesClicked[1];
+        statesClicked[1] = state;
+        d3.select("."+state.replace(" ","_"))
+            .attr("id","clicked")
+    }
+    }
+    console.log("Array:" +statesClicked)
+
+    console.log("Current States Selected: "+statesClicked[0]+" and "+statesClicked[1])
+    //console.log(statesClicked);
+    console.log(numStatesClicked);
+    //console.log(statesClicked[numStatesClicked])
+    //console.log(statesClicked[numStatesClicked-1])
+    //console.log("selection:" + statesClicked[numStatesClicked]);
+        
+    /*if($("#clicked").length)
+    {
+        d3.select("."+state.replace(" ","_"))
+            .attr("id","")
+    }
+    else{
+        d3.select("."+state.replace(" ","_"))
+            .attr("id","clicked")
+    }*/
     
     //console.log("clicked:"+numStatesClicked)
     console.log("click! " + d.properties.NAME); // TODO: highlight state logic
     
     numStatesClicked += 1
+
+    
 }
 
 
@@ -152,39 +207,3 @@ function renderComparisonCharts(state1, state2) {
 
 
 
-/*if (numStatesClicked == 0)
-    {
-        console.log("1: "+statesClicked[numStatesClicked]+"2: "+statesClicked[numStatesClicked+1]) 
-        d3.select("."+state1.replace(" ","_"))
-            .style("fill","orange");
-    }
-    else
-    {
-        var state2 = d.properties.NAME
-        statesClicked.push(state2)
-        if (numStatesClicked == 1)
-        {
-            console.log("1: "+statesClicked[numStatesClicked]+"2: "+statesClicked[numStatesClicked+1])
-            d3.select("."+state2.replace(" ","_"))
-                .style("fill","orange");
-        }
-        else
-        {
-            d3.select("."+state1.replace(" ","_"))
-                .style("fill","transparent");
-            state1 = state2;
-            state2 = d.properties.NAME
-            console.log("1: "+state1+"2: "+state2)
-            d3.select("."+state2.replace(" ","_"))
-                .style("fill","orange");
-        }
-    
-        //console.log("Too many states clicked.")
-    }
-    /*else 
-    {
-        state1 = state2;
-        state2 = d.properties.NAME
-        d3.select("."+state2.replace(" ","_"))
-            .style("fill","orange");
-    */
