@@ -247,8 +247,8 @@ function clickState(event, d) {
     }
     console.log("Array:" + statesClicked)
 
-    console.log("Current States Selected: " + statesClicked[0] + " and " + statesClicked[1]) =
-        console.log(numStatesClicked);
+    console.log("Current States Selected: " + statesClicked[0] + " and " + statesClicked[1])
+    console.log(numStatesClicked);
 
     console.log("click! " + d.properties.NAME);
 
