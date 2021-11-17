@@ -1,4 +1,4 @@
-//insert code here!
+let year = 2019;
 window.onload = function() {
     renderMap();
     renderNationalCharts();
@@ -9,11 +9,12 @@ var numStatesClicked = 0
 // function to draw all the state borders
 function renderMap() {
     let width = 1000;
-    let height = 600;
+    let height = 800;
+    let mapHeight = 600;
 
     // set the map projection to be Albers USA
     let projection = d3.geoAlbersUsa()
-        .translate([width / 2, height / 2]) // center the map on the screen
+        .translate([width / 2, mapHeight / 2]) // center the map on the screen
         .scale([1200]);
 
     // path generator to draw the borders of the states
@@ -24,7 +25,8 @@ function renderMap() {
     let svg = d3.select("body")
         .append("svg")
         .attr("width", width)
-        .attr("height", height);
+        .attr("height", height)
+        .attr("class", "mapContainer");
 
     // load the national csv data
 
@@ -58,8 +60,9 @@ function renderMap() {
         console.log(data);
 
         // create a base color scale for the national map of incarceration rates in 2019
-        let baseData = "2019_incarceration_rate";
-        let colorScale = makeColorScale(data.features, baseData);
+        let yearData = year + "_incarceration_rate";
+        console.log(yearData);
+        let colorScale = makeColorScale(data.features, yearData);
 
         // draw the state borders from the GeoJSON features
         svg.selectAll("path")
@@ -75,7 +78,7 @@ function renderMap() {
             .style("stroke-width", "1")
             .style("fill", function(d) {
                 // get the color from the scale based on the scaleQuantize function
-                let color = colorScale(d[baseData]);
+                let color = colorScale(d[yearData]);
                 color = color ? color : "#ccc";
                 return color
             });
@@ -85,8 +88,9 @@ function renderMap() {
         let legendHeight = 150;
         let legendWidth = 200;
         // container for the legend + legend title
-        let legendContainer = d3.select("body").append("svg")
+        let legendContainer = svg.append("svg")
             .attr("class", "legend-container")
+            .attr("transform", "translate(0," + mapHeight + ")")
             .attr("width", legendWidth)
             .attr("height", 200);
 
@@ -99,7 +103,7 @@ function renderMap() {
         legendTitle.append("tspan")
             .attr("x", 0)
             .attr("dy", "1em")
-            .text(baseData.replaceAll("_", " "));
+            .text(yearData.replaceAll("_", " "));
         legendTitle.append("tspan")
             .attr("x", 0)
             .attr("dy", "1em")
@@ -151,8 +155,9 @@ function renderMap() {
             .text("No Data");
 
         // add svg to hold click boxes to change time scale
-        let timeContainer = d3.select("body").append("svg")
+        let timeContainer = svg.append("svg")
             .attr("class", "time-container")
+            .attr("transform", "translate(" + legendWidth + "," + mapHeight + ")")
             .attr("width", 200)
             .attr("height", 200);
         // add a title to the time selector
@@ -176,15 +181,23 @@ function renderMap() {
         timeSelector.append("rect")
             .attr("width", 18)
             .attr("height", 18)
+            .attr("class", function(d) { return "y" + d })
             .style("outline-style", "solid")
             .style("outline-width", "thin")
             .style("outline-offset", "-1px")
-            .style("fill", "white");
+            .style("fill", "white")
+            .on("click", function(event, d) {
+                changeYear(event, d);
+            });
         timeSelector.append("text")
             .attr("x", 24)
             .attr("y", 8.5)
             .attr("dy", ".35em")
             .text(function(d) { return d });
+
+        // shade in the year
+        d3.select(".y" + year)
+            .attr("id", "selected");
     });
 }
 
@@ -207,6 +220,7 @@ function makeColorScale(data, key) {
     }
     let max = Math.max(...domainArray);
     let min = Math.min(...domainArray);
+    console.log(min + ", " + max);
 
     // give the array of incarceration data as the scale domain
     let colorScale = d3.scaleQuantize()
@@ -214,6 +228,16 @@ function makeColorScale(data, key) {
         .range(colorClasses);
 
     return colorScale;
+}
+
+// change year when box is clicked
+function changeYear(event, d) {
+    year = d;
+    console.log(d);
+    d3.select("#selected")
+        .attr("id", "");
+    d3.select(".y" + d)
+        .attr("id", "selected");
 }
 
 const statesClicked = [];

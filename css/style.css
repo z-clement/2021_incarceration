@@ -3,10 +3,15 @@
     text-transform: capitalize;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
+
 .time-title {
     font-weight: bold;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
+
+
+/* For when states are clicked */
+
 #clicked {
     stroke: rgb(20, 155, 209) !important;
     stroke-width: 6px !important;
@@ -16,7 +21,15 @@
     /* opacity: 0.5; */
     /* background: rgba(100, 0, 0, 0.8) !important;  */
 }
-h1{
+
+
+/* For when times are selected */
+
+#selected {
+    fill: #70808080 !important;
+}
+
+h1 {
     text-align: center;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     font-size: 30pt;
