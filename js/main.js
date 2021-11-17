@@ -73,7 +73,6 @@ function renderMap() {
             })
             .style("stroke", "#000")
             .style("stroke-width", "1")
-            .style("opacity","1")
             .style("fill", function(d) {
                 // get the color from the scale based on the scaleQuantize function
                 let color = colorScale(d[baseData]);
@@ -248,8 +247,8 @@ function clickState(event, d) {
     }
     console.log("Array:" + statesClicked)
 
-    console.log("Current States Selected: " + statesClicked[0] + " and " + statesClicked[1])
-    console.log(numStatesClicked);
+    console.log("Current States Selected: " + statesClicked[0] + " and " + statesClicked[1]) =
+        console.log(numStatesClicked);
 
     console.log("click! " + d.properties.NAME);
 
