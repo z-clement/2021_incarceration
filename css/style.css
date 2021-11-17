@@ -7,8 +7,18 @@
     font-weight: bold;
 }
 
+
+/* For when states are clicked */
+
 #clicked {
     stroke: orange !important;
     stroke-width: 8px !important;
+    fill: #70808080 !important;
+}
+
+
+/* For when times are selected */
+
+#selected {
     fill: #70808080 !important;
 }
