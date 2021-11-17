@@ -9,11 +9,12 @@ var numStatesClicked = 0
 // function to draw all the state borders
 function renderMap() {
     let width = 1000;
-    let height = 600;
+    let height = 800;
+    let mapHeight = 600;
 
     // set the map projection to be Albers USA
     let projection = d3.geoAlbersUsa()
-        .translate([width / 2, height / 2]) // center the map on the screen
+        .translate([width / 2, mapHeight / 2]) // center the map on the screen
         .scale([1200]);
 
     // path generator to draw the borders of the states
@@ -85,8 +86,9 @@ function renderMap() {
         let legendHeight = 150;
         let legendWidth = 200;
         // container for the legend + legend title
-        let legendContainer = d3.select("body").append("svg")
+        let legendContainer = svg.append("svg")
             .attr("class", "legend-container")
+            .attr("transform", "translate(0," + mapHeight + ")")
             .attr("width", legendWidth)
             .attr("height", 200);
 
@@ -151,8 +153,9 @@ function renderMap() {
             .text("No Data");
 
         // add svg to hold click boxes to change time scale
-        let timeContainer = d3.select("body").append("svg")
+        let timeContainer = svg.append("svg")
             .attr("class", "time-container")
+            .attr("transform", "translate(" + legendWidth + "," + mapHeight + ")")
             .attr("width", 200)
             .attr("height", 200);
         // add a title to the time selector
