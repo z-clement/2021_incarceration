@@ -206,16 +206,24 @@ function renderMap() {
 
         let stateSelectWidth = (width - timeWidth - legendWidth) / 2;
         let state1 = svg.append("svg")
-            .attr("class", "state1")
             .attr("transform", "translate(" + (timeWidth + legendWidth) + "," + mapHeight + ")")
             .attr("width", stateSelectWidth)
             .attr("height", legendHeight);
+            state1.append("text")
+            .attr("class", "state1")
+            .attr("x",30)
+            .attr("y",30)
+            .text("State 1: undefined");
 
         let state2 = svg.append("svg")
-            .attr("class", "state2")
             .attr("transform", "translate(" + (timeWidth + legendWidth + stateSelectWidth) + "," + mapHeight + ")")
             .attr("width", stateSelectWidth)
             .attr("height", legendHeight);
+            state2.append("text")
+            .attr("class", "state2")
+            .attr("x",30)
+            .attr("y",30)
+            .text("State 2: undefined");
     });
 }
 
@@ -311,6 +319,12 @@ function clickState(event, d) {
     console.log("click! " + d.properties.NAME);
 
     numStatesClicked += 1
+
+    d3.select(".state1")
+        .text("State 1: "+ statesClicked[0]);
+
+    d3.select(".state2")
+        .text("State 2: "+ statesClicked[1]);
 
 
 }
