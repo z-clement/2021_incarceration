@@ -8,7 +8,11 @@
 }
 
 #clicked {
-    stroke: orange !important;
-    stroke-width: 8px !important;
-    fill: #70808080 !important;
+    stroke: rgb(20, 155, 209) !important;
+    stroke-width: 6px !important;
+    /* margin: 3px !important; */
+    /* outline: 5px solid red !important; */
+    /* fill: rgba(0,0,0,.6) !important;  */
+    /* opacity: 0.5; */
+    /* background: rgba(100, 0, 0, 0.8) !important;  */
 }
