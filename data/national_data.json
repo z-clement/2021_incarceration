@@ -1,0 +1,205 @@
+{
+  "type": "FeatureCollection",
+  "features": [{
+          "type": "Feature",
+          "properties": { 
+            "Demographic": "Total",
+            "2005_inmates": 747530,
+            "2013_inmates": 731570,
+            "2019_inmates": 734470,
+            "2005_2013_inmates_percent_change": -2.1,
+            "2013_2019_inmates_percent_change": 0.4,
+            "2005_2019_inmates_percent_change": -1.7,
+            "2005_incarceration_rate": 253,
+            "2013_incarceration_rate": 230,
+            "2019_incarceration_rate": 224,
+            "2005_2013_rate_percent_change": -9.1,
+            "2013_2019_rate_percent_change": -2.6,
+            "2005_2019_rate_percent_change": -11.5
+           }
+},
+{
+  "type": "Feature",
+  "properties": {
+    "Demographic": "Adults",
+    "2005_inmates": 740770,
+    "2013_inmates": 727150,
+    "2019_inmates": 731580,
+    "2005_2013_inmates_percent_change": -1.8,
+    "2013_2019_inmates_percent_change": 0.6,
+    "2005_2019_inmates_percent_change": -1.2,
+    "2005_incarceration_rate": 334,
+    "2013_incarceration_rate": 298,
+    "2019_incarceration_rate": 287,
+    "2005_2013_rate_percent_change": -10.8,
+    "2013_2019_rate_percent_change": -3.7,
+    "2005_2019_rate_percent_change": -14.1
+  }
+},
+{
+  "type": "Feature",
+  "properties": {
+    "Demographic": "Male",
+    "2005_inmates": 652960,
+    "2013_inmates": 630630,
+    "2019_inmates": 623730,
+    "2005_2013_inmates_percent_change": -3.4,
+    "2013_2019_inmates_percent_change": -1.1,
+    "2005_2019_inmates_percent_change": -4.5,
+    "2005_incarceration_rate": 448,
+    "2013_incarceration_rate": 403,
+    "2019_incarceration_rate": 386,
+    "2005_2013_rate_percent_change": -10,
+    "2013_2019_rate_percent_change": -4.2,
+    "2005_2019_rate_percent_change": -13.8
+  }
+},
+{
+  "type": "Feature",
+  "properties": {
+    "Demographic": "Female",
+    "2005_inmates": 94570,
+    "2013_inmates": 100940,
+    "2019_inmates": 110730,
+    "2005_2013_inmates_percent_change": 6.7,
+    "2013_2019_inmates_percent_change": 9.7,
+    "2005_2019_inmates_percent_change": 17.1,
+    "2005_incarceration_rate": 63,
+    "2013_incarceration_rate": 63,
+    "2019_incarceration_rate": 66,
+    "2005_2013_rate_percent_change": 0,
+    "2013_2019_rate_percent_change": 4.8,
+    "2005_2019_rate_percent_change": 4.8
+  }
+},
+{
+  "type": "Feature",
+  "properties": {
+    "Demographic": "White",
+    "2005_inmates": 331050,
+    "2013_inmates": 345310,
+    "2019_inmates": 362920,
+    "2005_2013_inmates_percent_change": -3.4,
+    "2013_2019_inmates_percent_change": 5.1,
+    "2005_2019_inmates_percent_change": 9.6,
+    "2005_incarceration_rate": 167,
+    "2013_incarceration_rate": 175,
+    "2019_incarceration_rate": 184,
+    "2005_2013_rate_percent_change": 4.8,
+    "2013_2019_rate_percent_change": 5.1,
+    "2005_2019_rate_percent_change": 10.2
+  }
+},
+{
+  "type": "Feature",
+  "properties": {
+    "Demographic": "Black",
+    "2005_inmates": 290520,
+    "2013_inmates": 253770,
+    "2019_inmates": 247060,
+    "2005_2013_inmates_percent_change": -12.6,
+    "2013_2019_inmates_percent_change": -2.6,
+    "2005_2019_inmates_percent_change": -15,
+    "2005_incarceration_rate": 803,
+    "2013_incarceration_rate": 645,
+    "2019_incarceration_rate": 600,
+    "2005_2013_rate_percent_change": -19.7,
+    "2013_2019_rate_percent_change": -7,
+    "2005_2019_rate_percent_change": -25.3
+  }
+},
+{
+  "type": "Feature",
+  "properties": {
+    "Demographic": "Hispanic",
+    "2005_inmates": 111930,
+    "2013_inmates": 114590,
+    "2019_inmates": 106920,
+    "2005_2013_inmates_percent_change": 2.4,
+    "2013_2019_inmates_percent_change": -6.7,
+    "2005_2019_inmates_percent_change": -4.5,
+    "2005_incarceration_rate": 263,
+    "2013_incarceration_rate": 209,
+    "2019_incarceration_rate": 176,
+    "2005_2013_rate_percent_change": -20.5,
+    "2013_2019_rate_percent_change": -15.8,
+    "2005_2019_rate_percent_change": -33.1
+  }
+},
+{
+  "type": "Feature",
+  "properties": {
+    "Demographic": "American Indian/Alaska Native",
+    "2005_inmates": 7630,
+    "2013_inmates": 9530,
+    "2019_inmates": 10220,
+    "2005_2013_inmates_percent_change": 24.9,
+    "2013_2019_inmates_percent_change": 7.2,
+    "2005_2019_inmates_percent_change": 33.9,
+    "2005_incarceration_rate": 340,
+    "2013_incarceration_rate": 407,
+    "2019_incarceration_rate": 420,
+    "2005_2013_rate_percent_change": 19.7,
+    "2013_2019_rate_percent_change": 3.2,
+    "2005_2019_rate_percent_change": 23.5
+  }
+},
+{
+  "type": "Feature",
+  "properties": {
+    "Demographic": "Asian",
+    "2005_inmates": 4890,
+    "2013_inmates": 4790,
+    "2019_inmates": 4720,
+    "2005_2013_inmates_percent_change": -2,
+    "2013_2019_inmates_percent_change": -1.5,
+    "2005_2019_inmates_percent_change": -3.5,
+    "2005_incarceration_rate": 40,
+    "2013_incarceration_rate": 29,
+    "2019_incarceration_rate": 25,
+    "2005_2013_rate_percent_change": -27.5,
+    "2013_2019_rate_percent_change": -13.8,
+    "2005_2019_rate_percent_change": -37.5
+  }
+},
+{
+  "type": "Feature",
+  "properties": {
+    "Demographic": "Native Hawaiian/Other Pacific Islander",
+    "2005_inmates": 500,
+    "2013_inmates": 610,
+    "2019_inmates": 770,
+    "2005_2013_inmates_percent_change": 22,
+    "2013_2019_inmates_percent_change": 26.2,
+    "2005_2019_inmates_percent_change": 54,
+    "2005_incarceration_rate": 121,
+    "2013_incarceration_rate": 113,
+    "2019_incarceration_rate": 129,
+    "2005_2013_rate_percent_change": -6.6,
+    "2013_2019_rate_percent_change": 14.2,
+    "2005_2019_rate_percent_change": 6.6
+  }
+},
+{
+  "type": "Feature",
+  "properties": {
+    "Demographic": "Two or more races",
+    "2005_inmates": 1020,
+    "2013_inmates": 2970,
+    "2019_inmates": 1850,
+    "2005_2013_inmates_percent_change": 191.2,
+    "2013_2019_inmates_percent_change": -37.7,
+    "2005_2019_inmates_percent_change": 81.4,
+    "2005_incarceration_rate": 25,
+    "2013_incarceration_rate": 47,
+    "2019_incarceration_rate": 25,
+    "2005_2013_rate_percent_change": 88,
+    "2013_2019_rate_percent_change": -46.8,
+    "2005_2019_rate_percent_change": 0
+  }
+}
+]
+}
+
+  
+  

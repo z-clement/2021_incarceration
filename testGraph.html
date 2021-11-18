@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<html>
+    <head>
+
+    </head>
+    <body>
+        <script type="text/javascript" src="lib/d3.js"></script>
+
+        <div id='grid-container'>
+            <div id='grid-chart'></div>
+            <div id='grid-chartA'></div>
+            <div id='grid-chartB'></div>
+            <div id='gender-stat'></div>
+        </div>
+    </body>
+    <script>
+
+// let nationalData;
+// d3.json("data/national_data.json").then(function(data) {
+//     nationalData = data;
+//     console.log(nationalData);
+
+//             // // loop through each state & append the incarceration data
+//             // for (let i = 0; i < nationalData.features.length; i++) {
+//             // // get the state name
+//             // let ethnicity = nationalData.features[i].properties.Demographic;
+        
+//              //       }
+//        // console.log(nationalData);
+//         //console.log(nationalData.features[1].properties.Demographic);
+// });
+
+
+var drawGenderGraph = function(){
+    
+    //insert data
+    let nationalData;
+d3.json("data/national_data.json").then(function(data) {
+    nationalData = data;
+    console.log(nationalData);
+    
+    let percentFemale = ((nationalData.features[3].properties["2019_inmates"] / nationalData.features[0].properties["2019_inmates"]) * 100)
+    console.log(percentFemale);
+//});
+
+    //define font and color
+    var fontFamily = "helvetica";
+    var maleFill = "blue";
+    var femaleFill = "#F511FF";
+    var svgBackgroundColor = 'white';
+
+    const width = 280;
+    const height = 275;
+
+    //svg container
+    var svg = d3.select('#grid-chart')
+        .append('svg')
+        .attr("width", width)
+        .attr("height", height)
+        .attr("transform", "translate(1000,0)")
+        .style('background-color', svgBackgroundColor);
+
+    //define icon paths
+    var person = svg.append("defs")
+        .append("g")
+        .attr("id", "personIcon")
+
+    person
+        .append("path")
+        .attr("d","M12.075,10.812c1.358-0.853,2.242-2.507,2.242-4.037c0-2.181-1.795-4.618-4.198-4.618S5.921,4.594,5.921,6.775c0,1.53,0.884,3.185,2.242,4.037c-3.222,0.865-5.6,3.807-5.6,7.298c0,0.23,0.189,0.42,0.42,0.42h14.273c0.23,0,0.42-0.189,0.42-0.42C17.676,14.619,15.297,11.677,12.075,10.812 M6.761,6.775c0-2.162,1.773-3.778,3.358-3.778s3.359,1.616,3.359,3.778c0,2.162-1.774,3.778-3.359,3.778S6.761,8.937,6.761,6.775 M3.415,17.69c0.218-3.51,3.142-6.297,6.704-6.297c3.562,0,6.486,2.787,6.705,6.297H3.415z")
+
+    //define rows and columns
+    var numRows = 10;
+    var numCols = 10;
+
+    //axis scaling
+    var y = d3.scaleBand()
+        .range([0,250])
+        .domain(d3.range(numRows));
+
+    var x = d3.scaleBand()
+        .range([0,250])
+        .domain(d3.range(numCols));
+
+    data = d3.range(numCols*numRows);
+
+    //grid container - controls where grid is in element
+    var container = svg.append("g")
+        .attr("transform", "translate(20,20)");
+
+    container.selectAll("use")
+        .data(data)
+        .enter().append("use")
+        .attr("xlink:href", "#personIcon")
+        .attr("id", function(d){return "id"+d;})
+        .attr('x', function(d){return x(d%numCols);})
+        .attr('y', function(d){return y(Math.floor(d/numCols));})
+        .style('fill', function(d){return d < percentFemale ? femaleFill : maleFill;})
+    }); //end data function
+
+}
+
+var svg1 = d3.select('#gender-stat')
+        .append('svg1')
+        .attr("width", 200)
+        .attr("height", 200)
+        .attr("transform", "translate(1280,0)")
+
+var svg1 = d3.select("body")
+                .append("svg1")
+                //.attr("width", width)
+                //.attr("height", height);
+
+var genderStat = svg1.append("genderStat")
+    .attr("transform", "translate(1280,0)");
+               
+
+var drawAdultGraph = function(){
+    
+    //insert data here
+    let nationalData;
+d3.json("data/national_data.json").then(function(data) {
+    nationalData = data;
+    console.log(nationalData);
+    
+    let percentAdult = (((nationalData.features[0].properties["2019_inmates"] - nationalData.features[1].properties["2019_inmates"]) / nationalData.features[0].properties["2019_inmates"]) * 100)
+    console.log(percentAdult);
+//});
+
+    //define font and color
+    var fontFamily = "helvetica";
+    var childFill = "#1166FF";
+    var adultFill = "#F511FF";
+    var svgBackgroundColor = 'white';
+
+    const width = 280;
+    const height = 75;
+
+    //svg container
+    var svgA = d3.select('#grid-chartA')
+        .append('svg')
+        .attr("width", width)
+        .attr("height", height)
+        .attr("transform", "translate(1000,0)")
+        .style('background-color', svgBackgroundColor);
+
+    //define rows and columns
+    var numRows = 1;
+    var numCols = 10;
+
+    //axis scaling
+    var y = d3.scaleBand()
+        .range([0,250])
+        .domain(d3.range(numRows));
+
+    var x = d3.scaleBand()
+        .range([0,250])
+        .domain(d3.range(numCols));
+
+    data = d3.range(numCols*numRows);
+
+    //grid container - controls where grid is in element
+    var adultContainer = svgA.append("g")
+        .attr("transform", "translate(20,20)");
+
+    adultContainer.selectAll("use")
+        .data(data)
+        .enter().append("use")
+        .attr("xlink:href", "#personIcon")
+        .attr("id", function(d){return "id"+d;})
+        .attr('x', function(d){return x(d%numCols);})
+        .attr('y', function(d){return y(Math.floor(d/numCols));})
+        .style('fill', function(d){return d < percentAdult ? childFill : adultFill;})
+    });
+}
+
+function drawEthnicityGraph() {
+    var svg = d3.select("#grid-chartB").append("svg:svg")
+        .attr("width", 300)//canvasWidth)
+        .attr("height", 300)//canvasHeight);
+        .attr("transform", "translate(1000,0)"),
+        margin = { top: 20, right: 20, bottom: 30, left: 20 },
+        width = +svg.attr("width") - margin.left - margin.right,
+        height = +svg.attr("height") - margin.top - margin.bottom;
+
+    var x = d3.scaleBand().rangeRound([0, width]).padding(0.1),
+        y = d3.scaleLinear().rangeRound([height, 0]);
+
+    var g = svg.append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // change the dataset
+    d3.csv("data/2019_ethnicity.csv").then(function (d) {
+        // change the y value
+        d.inmates2019 = +d.inmates2019;
+
+        x.domain(d.map(function (data) { return data.Ethnicity; }));
+        y.domain([0, 362920]);
+        console.log(d3.max(d, function (data) { 
+            console.log(data.inmates2019)
+            return data.inmates2019; }));
+       
+        g.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+
+        g.append("g")
+            .attr("class", "axis axis--y")
+            .call(d3.axisLeft(y).ticks(10))
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", "0.71em")
+            .attr("text-anchor", "end")
+            .text("Population");
+
+        g.selectAll(".bar")
+            .data(d)
+            .enter().append("rect")
+            .attr("class", "bar")
+            .attr("x", function (d) { return x(d.Ethnicity); })
+            .attr("y", function (d) { return y(d.inmates2019); })
+            .attr("width", x.bandwidth())
+            .attr("height", function (d) { return height - y(d.inmates2019); })
+            .attr("id", function(data) {return data.Ethnicity + "Bar"; });
+
+        return d;
+    }).catch(function (error) {
+        
+        if (error) throw error;
+    });
+
+}
+
+drawGenderGraph();
+drawAdultGraph();
+drawEthnicityGraph();
+
+    </script>
+</html>
