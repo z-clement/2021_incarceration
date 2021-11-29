@@ -1,4 +1,4 @@
-let year = 2019;
+// global variable for the color scale so all functions can access it once the data is loaded
 let colorScale;
 // global variables to determine the size of the map container, map image, & legend elements
 const width = 1000;
@@ -58,10 +58,11 @@ function renderMap() {
 
         // create color scales for all national data, 2005, 2013, and 2019
         colorScale = makeColorScale(data.features);
+        // set the default year/data to 2019
         let yearData = "2019_incarceration_rate";
 
         // draw the state borders from the GeoJSON features
-        drawStateBorders(svg, data, colorScale, yearData);
+        drawStateBorders(svg, data, yearData);
         // create a legend with a title that corresponds to the data being mapped
         createLegend(svg, colorScale, yearData);
         // add svg to hold click boxes to change time scale
@@ -108,7 +109,7 @@ function makeColorScale(data) {
 }
 
 // draw the state borders on the webpage
-function drawStateBorders(svg, data, colorScale, yearData) {
+function drawStateBorders(svg, data, yearData) {
     // set the map projection to be Albers USA
     let projection = d3.geoAlbersUsa()
         .translate([width / 2, mapHeight / 2]) // center the map on the screen
@@ -131,7 +132,9 @@ function drawStateBorders(svg, data, colorScale, yearData) {
         .style("stroke-width", "1")
         .style("fill", function(d) {
             // get the color from the scale based on the scaleQuantize function
+            console.log(d);
             let color = colorScale(d[yearData]);
+            // if the color is undefined/null (means there's no data for that state) make the state gray
             color = color ? color : "#ccc";
             return color
         });
@@ -248,24 +251,28 @@ function createTimeSelect(svg) {
         .attr("dy", ".35em")
         .text(function(d) { return d });
 
-    // shade in the year
-    d3.select(".y" + year)
+    // shade in the default year, which is 2019
+    d3.select(".y2019")
         .attr("id", "selected");
 }
 
 // change year when box is clicked
 function changeYear(event, d) {
-    year = d;
+    let year = d;
+    // deselect the current year that is selected
     d3.select("#selected")
         .attr("id", "");
-    d3.select(".y" + d)
+    // add the "selected" id to the year that is clicked
+    d3.select(".y" + year)
         .attr("id", "selected");
+    // adjust the fill for all the states based on the data from the year that's selected
     d3.selectAll(".state")
         .style("fill", function(d) {
             let color = colorScale(d[year + "_incarceration_rate"]);
             color = color ? color : "#ccc";
             return color
         });
+    // update the legend title to reflect which year is selected (maybe not needed?)
     d3.select(".legend-title").select("tspan")
         .text(year + " incarceration rate");
 }
