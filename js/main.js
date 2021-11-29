@@ -35,7 +35,6 @@ function renderMap() {
 
     // load in the geoJSON data
     d3.json("data/better-states.json").then(function(data) {
-        console.log(data);
         console.log(incarcerationData)
 
         // loop through each state & append the incarceration data
@@ -64,7 +63,7 @@ function renderMap() {
         // draw the state borders from the GeoJSON features
         drawStateBorders(svg, data, yearData);
         // create a legend with a title that corresponds to the data being mapped
-        createLegend(svg, colorScale, yearData);
+        createLegend(svg, yearData);
         // add svg to hold click boxes to change time scale
         createTimeSelect(svg);
         // create elements that display which states are selected
@@ -98,7 +97,6 @@ function makeColorScale(data) {
     };
     let max = Math.max(...domainArray);
     let min = Math.min(...domainArray);
-    console.log(min + ", " + max);
 
     // give the array of incarceration data as the scale domain
     let colorScale = d3.scaleQuantize()
@@ -132,7 +130,6 @@ function drawStateBorders(svg, data, yearData) {
         .style("stroke-width", "1")
         .style("fill", function(d) {
             // get the color from the scale based on the scaleQuantize function
-            console.log(d);
             let color = colorScale(d[yearData]);
             // if the color is undefined/null (means there's no data for that state) make the state gray
             color = color ? color : "#ccc";
@@ -141,7 +138,7 @@ function drawStateBorders(svg, data, yearData) {
 }
 
 // create a legend & draw it on the page
-function createLegend(svg, colorScale, yearData) {
+function createLegend(svg, yearData) {
     // container for the legend + legend title
     let legendContainer = svg.append("svg")
         .attr("class", "legend-container")
@@ -343,14 +340,22 @@ function clickState(event, d) {
 
     d3.select(".state2")
         .text("State 2: " + statesClicked[1]);
-
-
 }
 
 
 // render the national charts
 function renderNationalCharts() {
     // import national data
+    let nationalData;
+    d3.csv("data/national_data.csv").then(function(data) {
+        nationalData = data;
+        console.log(nationalData);
+        // get the relevant data for the charts
+
+        // create a container for the charts
+
+        // render each chart
+    })
 }
 
 // render state charts for selected state
