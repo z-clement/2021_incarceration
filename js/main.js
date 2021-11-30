@@ -300,40 +300,36 @@ function createStateSelect(svg) {
 let statesClicked = [];
 // highlight state on click logic
 function clickState(event, d) {
-
     var state = d.properties.NAME
     console.log(state)
         // if else highlighted or not 
     if (statesClicked.includes(state)) {
         d3.select("." + state.replace(" ", "_"))
-            .attr("id", "")
-        statesClicked.splice(statesClicked.indexOf(state), 1)
+            .attr("id", "");
+        statesClicked.splice(statesClicked.indexOf(state), 1);
     } else {
-
-
         if (statesClicked.length < 2) {
-            console.log("A:" + statesClicked.length)
+            console.log("A:" + statesClicked.length);
             statesClicked.push(state);
             d3.select("." + state.replace(" ", "_"))
-                .attr("id", "clicked")
-
+                .attr("id", "clicked");
         } else {
             d3.select("." + statesClicked[0].replace(" ", "_"))
                 .attr("id", "");
             statesClicked[0] = statesClicked[1];
             statesClicked[1] = state;
             d3.select("." + state.replace(" ", "_"))
-                .attr("id", "clicked")
+                .attr("id", "clicked");
         }
     }
-    console.log("Array:" + statesClicked)
+    console.log("Array:" + statesClicked);
 
     console.log("Current States Selected: " + statesClicked[0] + " and " + statesClicked[1])
     console.log(numStatesClicked);
 
     console.log("click! " + d.properties.NAME);
 
-    numStatesClicked += 1
+    numStatesClicked += 1;
 
     d3.select(".state1")
         .text("State 1: " + statesClicked[0]);
@@ -345,16 +341,71 @@ function clickState(event, d) {
 
 // render the national charts
 function renderNationalCharts() {
-    // import national data
-    let nationalData;
-    d3.csv("data/national_data.csv").then(function(data) {
-        nationalData = data;
-        console.log(nationalData);
-        // get the relevant data for the charts
+    // create a container for the charts
+    let svg = d3.select("body")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("class", "chartContainer")
+        .attr("transform", "translate(" + width + ", 0)");
 
-        // create a container for the charts
+    // import national data
+    let nationalData = {};
+    d3.csv("data/national_data.csv").then(function(data) {
+        // console.log(data);
+        // sort the nationalData into a dictionary that's easier to work with
+        for (i = 0; i < data.length; i++) {
+            let demographic = data[i]["Demographic"];
+            // create a new entry in the object for the demographic (so that it can be accessed by nationalData["Male"])
+            nationalData[demographic] = [];
+            // loop through all the incarceration data for the demographic variable
+            for (key in data[i]) {
+                // add a property to the demographic object that has the data we want
+                // e.g. this can be accessed by nationalData["Male"]["2019_inmates"]
+                nationalData[demographic][key] = Number(data[i][key].replace(/,/g, '')); // the .replace is used to format the numbers from strings
+            }
+        }
+        console.log(nationalData);
+        // get the relevant data for the charts, for the default year of 2019
+        // we want sex, age, race & ethnicity
+        let totalIncarcerated = nationalData["Total"]["2019_inmates"];
+        let sexData = {
+            "Male": nationalData["Male"]["2019_inmates"],
+            "Female": nationalData["Female"]["2019_inmates"]
+        };
+        let ageData = {
+            "Adults": nationalData["Adults"]["2019_inmates"],
+            "Juvenile": totalIncarcerated - nationalData["Adults"]["2019_inmates"]
+        };
+        let raceData = {
+            "American Indian/Alaska Native": nationalData["American Indian/Alaska Native"]["2019_inmates"],
+            "Asian": nationalData["Asian"]["2019_inmates"],
+            "Black": nationalData["Black"]["2019_inmates"],
+            "Hispanic": nationalData["Hispanic"]["2019_inmates"],
+            "Native Hawaiian/Other Pacific Islander": nationalData["Native Hawaiian/Other�Pacific Islander"]["2019_inmates"],
+            "Two or more races": nationalData["Two or more races"]["2019_inmates"],
+            "White": nationalData["White"]["2019_inmates"]
+        };
+        console.log(sexData);
+        console.log(ageData);
+        console.log(raceData);
 
         // render each chart
+        // create svg containers for each of the 4 charts that are stacked
+        svg.append("svg")
+            .attr("width", width)
+            .attr("height", height / 3)
+            .attr("class", "sexChart");
+        svg.append("svg")
+            .attr("width", width)
+            .attr("height", height / 3)
+            .attr("transform", "translate(0," + height / 3 + ")")
+            .attr("class", "ageChart");
+        svg.append("svg")
+            .attr("width", width)
+            .attr("height", height / 3)
+            .attr("transform", "translate(0," + 2 * height / 3 + ")")
+            .attr("class", "raceChart");
     })
 }
 
