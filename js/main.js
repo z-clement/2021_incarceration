@@ -11,7 +11,7 @@ const timeWidth = 200;
 // global to store the national data so the csv doesn't have to be loaded every time our view changes
 let nationalData = {};
 // global variables to determine the size of the chart container
-const chartContainerW = 500;
+const chartContainerW = 800;
 
 window.onload = function() {
     renderMap();
@@ -390,11 +390,11 @@ function renderNationalCharts() {
         // render each chart
         // create svg containers for each of the 4 charts that are stacked
         let sexContainer = svg.append("svg")
-            .attr("width", chartContainerW)
+            .attr("width", chartContainerW-200)
             .attr("height", height / 3)
             .attr("class", "sexChart");
         let ageContainer = svg.append("svg")
-            .attr("width", chartContainerW)
+            .attr("width", chartContainerW-200)
             .attr("height", height / 3)
             .attr("transform", "translate(0," + height / 3 + ")")
             .attr("class", "ageChart");
@@ -407,13 +407,16 @@ function renderNationalCharts() {
         // chart for sex
         let sexColor = ["blue", "pink"];
         renderPeopleChart(sexData, sexContainer, sexColor);
+        sexLegend(svg);
 
         // chart for age
         let ageColor = ["orange", "green"];
         renderPeopleChart(ageData, ageContainer, ageColor);
+        ageLegend(svg);
 
         // bar chart for race
         renderRaceChart(raceData, raceContainer);
+
     })
 }
 
@@ -572,5 +575,100 @@ function renderStateCharts(state) {
 // render comparison charts
 function renderComparisonCharts(state1, state2) {
 
+}
+
+
+function sexLegend(svg) {
+    // container for the legend + legend title
+    let legendContainer = svg.append("svg")
+        .attr("class", "sexlegend-container")
+        .attr("transform", "translate("+(chartContainerW-200) + ",0)")
+        .attr("width", legendWidth)
+        .attr("height", 200);
+
+    // text element that holds the title
+    // tspan elements to make this multiline
+
+    // add an svg legend for the initial data
+    // adapted from Mike Bostock: http://bl.ocks.org/mbostock/3888852
+    let legend = legendContainer.append("svg")
+        .attr("class", "legend")
+        .attr("height", legendHeight)
+        .selectAll("g")
+        .data(["male", "female"])
+        .enter().append("g")
+        .attr("transform", function(d, i) {
+            return "translate(0," + (10 + i * 20) + ")";
+        });
+
+    legend.append("rect")
+        .attr("width", 18)
+        .attr("height", 18)
+        .style("fill", function(d) {
+            if (d == "male")
+            {
+                return "red"
+            }
+            else{
+                return "blue"
+            }
+        });
+
+    legend.append("text")
+        .attr("x", 24)
+        .attr("y", 9)
+        .attr("dy", ".35em")
+        .text(function(d) {
+            // use invertExtent to go from range to domain for labels
+            return d; 
+        });
+ 
+}
+
+function ageLegend(svg) {
+    // container for the legend + legend title
+    let legendContainer = svg.append("svg")
+        .attr("class", "sexlegend-container")
+        .attr("transform", "translate("+(chartContainerW-200) + ",300)")
+        .attr("width", legendWidth)
+        .attr("height", 200);
+
+    // text element that holds the title
+    // tspan elements to make this multiline
+
+    // add an svg legend for the initial data
+    // adapted from Mike Bostock: http://bl.ocks.org/mbostock/3888852
+    let legend = legendContainer.append("svg")
+        .attr("class", "legend")
+        .attr("height", legendHeight)
+        .selectAll("g")
+        .data(["Adult","Juvenile"])
+        .enter().append("g")
+        .attr("transform", function(d, i) {
+            return "translate(0," + (10 + i * 20) + ")";
+        });
+
+    legend.append("rect")
+        .attr("width", 18)
+        .attr("height", 18)
+        .style("fill", function(d) {
+            if (d == "Adult")
+            {
+                return "red"
+            }
+            else{
+                return "blue"
+            }
+        });
+
+    legend.append("text")
+        .attr("x", 24)
+        .attr("y", 9)
+        .attr("dy", ".35em")
+        .text(function(d) {
+            // use invertExtent to go from range to domain for labels
+            return d; 
+        });
+ 
 }
 
