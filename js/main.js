@@ -359,9 +359,10 @@ function renderNationalCharts() {
         .append("g")
         .attr("id", "personIcon");
     person.append("path")
-        .attr("d", "M12.075,10.812c1.358-0.853,2.242-2.507,2.242-4.037c0-2.181-1.795-4.618-4.198-4.618S5.921,4.594,5.921,6.775c0,1.53,0.884,3.185,2.242,4.037c-3.222,0.865-5.6,3.807-5.6,7.298c0,0.23,0.189,0.42,0.42,0.42h14.273c0.23,0,0.42-0.189,0.42-0.42C17.676,14.619,15.297,11.677,12.075,10.812 M6.761,6.775c0-2.162,1.773-3.778,3.358-3.778s3.359,1.616,3.359,3.778c0,2.162-1.774,3.778-3.359,3.778S6.761,8.937,6.761,6.775 M3.415,17.69c0.218-3.51,3.142-6.297,6.704-6.297c3.562,0,6.486,2.787,6.705,6.297H3.415z");
-
-    // import national data
+        .attr("d", "M12.075,10.812c1.358-0.853,2.242-2.507,2.242-4.037c0-2.181-1.795-4.618-4.198-4.618S5.921,4.594,5.921,6.775c0,1.53,0.884,3.185,2.242,4.037c-3.222,0.865-5.6,3.807-5.6,7.298c0,0.23,0.189,0.42,0.42,0.42h14.273c0.23,0,0.42-0.189,0.42-0.42C17.676,14.619,15.297,11.677,12.075,10.812 M6.761,6.775c0-2.162,1.773-3.778,3.358-3.778s3.359,1.616,3.359,3.778c0,2.162-1.774,3.778-3.359,3.778S6.761,8.937,6.761,6.775 M3.415,17.69c0.218-3.51,3.142-6.297,6.704-6.297c3.562,0,6.486,2.787,6.705,6.297H3.415z")
+        //.attr("d", "M 256 288 c 79.5 0 144 -64.5 144 -144 S 335.5 0 256 0 S 112 64.5 112 144 s 64.5 144 144 144 Z m 128 32 h -55.1 c -22.2 10.2 -46.9 16 -72.9 16 s -50.6 -5.8 -72.9 -16 H 128 C 57.3 320 0 377.3 0 448 v 16 c 0 26.5 21.5 48 48 48 h 416 c 26.5 0 48 -21.5 48 -48 v -16 c 0 -70.7 -57.3 -128 -128 -128 Z")
+        //.style("font-size",2);
+        // import national data
     d3.csv("data/national_data.csv").then(function(data) {
         // console.log(data);
         // sort the nationalData into a dictionary that's easier to work with
@@ -405,7 +406,7 @@ function renderNationalCharts() {
             .attr("class", "raceChart");
 
         // chart for sex
-        let sexColor = ["blue", "pink"];
+        let sexColor = ["pink", "blue"];
         renderPeopleChart(sexData, sexContainer, sexColor);
         sexLegend(svg);
 
@@ -595,7 +596,7 @@ function sexLegend(svg) {
         .attr("class", "legend")
         .attr("height", legendHeight)
         .selectAll("g")
-        .data(["male", "female"])
+        .data(["Male", "Female"])
         .enter().append("g")
         .attr("transform", function(d, i) {
             return "translate(0," + (10 + i * 20) + ")";
@@ -605,12 +606,12 @@ function sexLegend(svg) {
         .attr("width", 18)
         .attr("height", 18)
         .style("fill", function(d) {
-            if (d == "male")
+            if (d == "Male")
             {
-                return "red"
+                return "blue"
             }
             else{
-                return "blue"
+                return "pink"
             }
         });
 
@@ -654,10 +655,10 @@ function ageLegend(svg) {
         .style("fill", function(d) {
             if (d == "Adult")
             {
-                return "red"
+                return "green"
             }
             else{
-                return "blue"
+                return "orange"
             }
         });
 
