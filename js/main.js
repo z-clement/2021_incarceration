@@ -8,6 +8,8 @@ const titleHeight = 30;
 const legendHeight = 150;
 const legendWidth = 200;
 const timeWidth = 200;
+// global to store the national data so the csv doesn't have to be loaded every time our view changes
+let nationalData = {};
 // global variables to determine the size of the chart container
 const chartContainerW = 500;
 
@@ -274,6 +276,9 @@ function changeYear(event, d) {
     // update the legend title to reflect which year is selected (maybe not needed?)
     d3.select(".legend-title").select("tspan")
         .text(year + " incarceration rate");
+
+    // update the charts for the new year
+
 }
 
 function createStateSelect(svg) {
@@ -349,17 +354,14 @@ function renderNationalCharts() {
         .attr("width", chartContainerW)
         .attr("height", height)
         .attr("class", "chartContainer");
-    // .attr("transform", "translate(" + width + ", 0)");
     //define icon paths for the charts shown using people as icons
     let person = svg.append("defs")
         .append("g")
-        .attr("id", "personIcon")
-
+        .attr("id", "personIcon");
     person.append("path")
         .attr("d", "M12.075,10.812c1.358-0.853,2.242-2.507,2.242-4.037c0-2.181-1.795-4.618-4.198-4.618S5.921,4.594,5.921,6.775c0,1.53,0.884,3.185,2.242,4.037c-3.222,0.865-5.6,3.807-5.6,7.298c0,0.23,0.189,0.42,0.42,0.42h14.273c0.23,0,0.42-0.189,0.42-0.42C17.676,14.619,15.297,11.677,12.075,10.812 M6.761,6.775c0-2.162,1.773-3.778,3.358-3.778s3.359,1.616,3.359,3.778c0,2.162-1.774,3.778-3.359,3.778S6.761,8.937,6.761,6.775 M3.415,17.69c0.218-3.51,3.142-6.297,6.704-6.297c3.562,0,6.486,2.787,6.705,6.297H3.415z");
 
     // import national data
-    let nationalData = {};
     d3.csv("data/national_data.csv").then(function(data) {
         // console.log(data);
         // sort the nationalData into a dictionary that's easier to work with
@@ -377,24 +379,10 @@ function renderNationalCharts() {
         console.log(nationalData);
         // get the relevant data for the charts, for the default year of 2019
         // we want sex, age, race & ethnicity
-        let totalIncarcerated = nationalData["Total"]["2019_inmates"];
-        let sexData = {
-            "Male": nationalData["Male"]["2019_inmates"],
-            "Female": nationalData["Female"]["2019_inmates"]
-        };
-        let ageData = {
-            "Adults": nationalData["Adults"]["2019_inmates"],
-            "Juvenile": totalIncarcerated - nationalData["Adults"]["2019_inmates"]
-        };
-        let raceData = {
-            "American Indian/Alaska Native": nationalData["American Indian/Alaska Native"]["2019_inmates"],
-            "Asian": nationalData["Asian"]["2019_inmates"],
-            "Black": nationalData["Black"]["2019_inmates"],
-            "Hispanic": nationalData["Hispanic"]["2019_inmates"],
-            "Native Hawaiian/Other Pacific Islander": nationalData["Native Hawaiian/Other Pacific Islander"]["2019_inmates"],
-            "Two or more races": nationalData["Two or more races"]["2019_inmates"],
-            "White": nationalData["White"]["2019_inmates"]
-        };
+        let data2019 = getNationalDataForYear("2019")
+        let sexData = data2019.sexData;
+        let ageData = data2019.ageData;
+        let raceData = data2019.raceData;
         // console.log(sexData);
         // console.log(ageData);
         // console.log(raceData);
@@ -427,6 +415,35 @@ function renderNationalCharts() {
         // bar chart for race
         renderRaceChart(raceData, raceContainer);
     })
+}
+
+// helper function to get the formatted data that we want for our charts from the national data
+function getNationalDataForYear(year) {
+    let yearString = year + "_inmates"
+    let totalIncarcerated = nationalData["Total"][yearString];
+    let sexData = {
+        "Male": nationalData["Male"][yearString],
+        "Female": nationalData["Female"][yearString]
+    };
+    let ageData = {
+        "Adults": nationalData["Adults"][yearString],
+        "Juvenile": totalIncarcerated - nationalData["Adults"][yearString]
+    };
+    let raceData = {
+        "American Indian/Alaska Native": nationalData["American Indian/Alaska Native"][yearString],
+        "Asian": nationalData["Asian"][yearString],
+        "Black": nationalData["Black"][yearString],
+        "Hispanic": nationalData["Hispanic"][yearString],
+        "Native Hawaiian/Other Pacific Islander": nationalData["Native Hawaiian/Other Pacific Islander"][yearString],
+        "Two or more races": nationalData["Two or more races"][yearString],
+        "White": nationalData["White"][yearString]
+    };
+    return {
+        "totalIncarcerated": totalIncarcerated,
+        "sexData": sexData,
+        "ageData": ageData,
+        "raceData": raceData
+    }
 }
 
 // function to draw the race chart onto the given container
