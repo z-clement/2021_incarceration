@@ -391,7 +391,7 @@ function renderNationalCharts() {
             "Asian": nationalData["Asian"]["2019_inmates"],
             "Black": nationalData["Black"]["2019_inmates"],
             "Hispanic": nationalData["Hispanic"]["2019_inmates"],
-            "Native Hawaiian/Other Pacific Islander": nationalData["Native Hawaiian/Other�Pacific Islander"]["2019_inmates"],
+            "Native Hawaiian/Other Pacific Islander": nationalData["Native Hawaiian/Other Pacific Islander"]["2019_inmates"],
             "Two or more races": nationalData["Two or more races"]["2019_inmates"],
             "White": nationalData["White"]["2019_inmates"]
         };
