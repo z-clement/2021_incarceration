@@ -286,7 +286,7 @@ function createStateSelect(svg) {
         .attr("class", "state1")
         .attr("x", 30)
         .attr("y", 30)
-        .text("State 1: undefined");
+        .text("State 1: Click a state to select it!");
 
     let state2 = svg.append("svg")
         .attr("transform", "translate(" + (timeWidth + legendWidth + stateSelectWidth) + "," + mapHeight + ")")
@@ -296,7 +296,7 @@ function createStateSelect(svg) {
         .attr("class", "state2")
         .attr("x", 30)
         .attr("y", 30)
-        .text("State 2: undefined");
+        .text("State 2: Select a 2nd state to compare!");
 }
 
 let statesClicked = [];
@@ -467,7 +467,8 @@ function renderRaceChart(raceData, raceContainer) {
         .attr("y", function(d) { return y(raceData[d]); })
         .attr("width", x.bandwidth())
         .attr("height", function(d) { return raceHeight - y(raceData[d]); })
-        .attr("id", function(d) { return d + "Bar" });
+        .attr("id", function(d) { return d.replaceAll(" ", "_").replace("/","_") + "Bar" });
+        
 }
 
 // function to separate long axis labels into multiline tspans (from Mike Bostock: https://bl.ocks.org/mbostock/7555321)
@@ -555,3 +556,4 @@ function renderStateCharts(state) {
 function renderComparisonCharts(state1, state2) {
 
 }
+

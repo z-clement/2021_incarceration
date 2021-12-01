@@ -9,11 +9,39 @@
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
+#BlackBar
+{
+    fill:blueviolet;
+}
+#WhiteBar
+{
+    fill:chocolate;
+}
+#HispanicBar
+{
+    fill:cornflowerblue
+}
+#AsianBar
+{
+    fill:darkgreen
+}
+#American_Indian_Alaska_NativeBar
+{
+    fill:gold
+}
+#Native_Hawaiian_Other_Pacific_IslanderBar
+{
+    fill:hotpink
+}
+#Two_or_more_racesBar
+{
+    fill:lawngreen
+}
 
 /* For when states are clicked */
 
 #clicked {
-    stroke: rgb(20, 155, 209) !important;
+    stroke: rgb(95, 95, 95) !important;
     stroke-width: 6px !important;
     /* margin: 3px !important; */
     /* outline: 5px solid red !important; */
