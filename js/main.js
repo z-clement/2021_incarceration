@@ -8,6 +8,8 @@ const titleHeight = 30;
 const legendHeight = 150;
 const legendWidth = 200;
 const timeWidth = 200;
+// global variables to determine the size of the chart container
+const chartContainerW = 500;
 
 window.onload = function() {
     renderMap();
@@ -344,10 +346,17 @@ function renderNationalCharts() {
     // create a container for the charts
     let svg = d3.select("body")
         .append("svg")
-        .attr("width", width)
+        .attr("width", chartContainerW)
         .attr("height", height)
-        .attr("class", "chartContainer")
-        .attr("transform", "translate(" + width + ", 0)");
+        .attr("class", "chartContainer");
+    // .attr("transform", "translate(" + width + ", 0)");
+    //define icon paths for the charts shown using people as icons
+    let person = svg.append("defs")
+        .append("g")
+        .attr("id", "personIcon")
+
+    person.append("path")
+        .attr("d", "M12.075,10.812c1.358-0.853,2.242-2.507,2.242-4.037c0-2.181-1.795-4.618-4.198-4.618S5.921,4.594,5.921,6.775c0,1.53,0.884,3.185,2.242,4.037c-3.222,0.865-5.6,3.807-5.6,7.298c0,0.23,0.189,0.42,0.42,0.42h14.273c0.23,0,0.42-0.189,0.42-0.42C17.676,14.619,15.297,11.677,12.075,10.812 M6.761,6.775c0-2.162,1.773-3.778,3.358-3.778s3.359,1.616,3.359,3.778c0,2.162-1.774,3.778-3.359,3.778S6.761,8.937,6.761,6.775 M3.415,17.69c0.218-3.51,3.142-6.297,6.704-6.297c3.562,0,6.486,2.787,6.705,6.297H3.415z");
 
     // import national data
     let nationalData = {};
@@ -386,27 +395,156 @@ function renderNationalCharts() {
             "Two or more races": nationalData["Two or more races"]["2019_inmates"],
             "White": nationalData["White"]["2019_inmates"]
         };
-        console.log(sexData);
-        console.log(ageData);
-        console.log(raceData);
+        // console.log(sexData);
+        // console.log(ageData);
+        // console.log(raceData);
 
         // render each chart
         // create svg containers for each of the 4 charts that are stacked
-        svg.append("svg")
-            .attr("width", width)
+        let sexContainer = svg.append("svg")
+            .attr("width", chartContainerW)
             .attr("height", height / 3)
             .attr("class", "sexChart");
-        svg.append("svg")
-            .attr("width", width)
+        let ageContainer = svg.append("svg")
+            .attr("width", chartContainerW)
             .attr("height", height / 3)
             .attr("transform", "translate(0," + height / 3 + ")")
             .attr("class", "ageChart");
-        svg.append("svg")
-            .attr("width", width)
+        let raceContainer = svg.append("svg")
+            .attr("width", chartContainerW)
             .attr("height", height / 3)
             .attr("transform", "translate(0," + 2 * height / 3 + ")")
             .attr("class", "raceChart");
+
+        // chart for sex
+        let sexColor = ["blue", "pink"];
+        renderPeopleChart(sexData, sexContainer, sexColor);
+
+        // chart for age
+        let ageColor = ["orange", "green"];
+        renderPeopleChart(ageData, ageContainer, ageColor);
+
+        // bar chart for race
+        renderRaceChart(raceData, raceContainer);
     })
+}
+
+// function to draw the race chart onto the given container
+function renderRaceChart(raceData, raceContainer) {
+    let margin = { top: 20, right: 20, bottom: 30, left: 70 };
+    let raceWidth = raceContainer.attr("width") - margin.left - margin.right;
+    let raceHeight = raceContainer.attr("height") - margin.top - margin.bottom;
+
+    let x = d3.scaleBand().rangeRound([0, raceWidth]).padding(0.1);
+    let y = d3.scaleLinear().rangeRound([raceHeight, 0]);
+
+    let g = raceContainer.append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    x.domain(Object.keys(raceData));
+    y.domain([0, d3.max(Object.values(raceData))]);
+
+    g.append("g")
+        .attr("class", "axis axis--x")
+        .attr("transform", "translate(0," + raceHeight + ")")
+        .call(d3.axisBottom(x))
+        .selectAll(".tick text")
+        .call(wrap, x.bandwidth());
+
+    g.append("g")
+        .attr("class", "axis axis--y")
+        .call(d3.axisLeft(y).ticks(10))
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", "0.71em")
+        .attr("text-anchor", "end");
+
+    g.selectAll(".bar")
+        .data(Object.keys(raceData))
+        .enter().append("rect")
+        .attr("class", "bar")
+        .attr("x", function(d) { return x(d); })
+        .attr("y", function(d) { return y(raceData[d]); })
+        .attr("width", x.bandwidth())
+        .attr("height", function(d) { return raceHeight - y(raceData[d]); })
+        .attr("id", function(d) { return d + "Bar" });
+}
+
+// function to separate long axis labels into multiline tspans (from Mike Bostock: https://bl.ocks.org/mbostock/7555321)
+function wrap(text, width) {
+    text.each(function() {
+        var text = d3.select(this),
+            words = text.text().split(/\s+/).reverse(),
+            word,
+            line = [],
+            lineNumber = 0,
+            lineHeight = 1.1, // ems
+            y = text.attr("y"),
+            dy = parseFloat(text.attr("dy")),
+            tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+        while (word = words.pop()) {
+            line.push(word);
+            tspan.text(line.join(" "));
+            if (tspan.node().getComputedTextLength() > width) {
+                line.pop();
+                tspan.text(line.join(" "));
+                line = [word];
+                tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+            }
+        }
+    });
+}
+
+// generic function to draw a chart of 100 people given the data & container provided
+// colors should be an array of two strings that represent the two colors the people should be shaded
+function renderPeopleChart(data, container, colors) {
+    //define rows and columns
+    let numRows = 10;
+    let numCols = 10;
+    // variables to control the spacing of the chart
+    let margin = { top: 20, right: 20, bottom: 30, left: 70 };
+    let chartWidth = container.attr("width") - margin.left - margin.right;
+    let chartHeight = container.attr("height") - margin.top - margin.bottom;
+
+    // math to figure out percentages
+    let total = 0;
+    let key; // key declared here so we can use it later to compare percentages (it's rough I know)
+    for (key in data) {
+        total += data[key];
+    }
+    // after looping to calculate the total, loop to calculate percentages & store them instead of the raw numbers
+    for (key in data) {
+        data[key] = data[key] / total;
+    }
+
+    //axis scaling
+    let y = d3.scaleBand()
+        .range([0, chartHeight])
+        .domain(d3.range(numRows));
+
+    let x = d3.scaleBand()
+        .range([0, chartWidth])
+        .domain(d3.range(numCols));
+
+    let gridData = d3.range(numCols * numRows);
+    //grid container - controls where grid is in element
+    var gridContainer = container.append("g")
+        .attr("transform", "translate(20,20)");
+
+    gridContainer.selectAll("use")
+        .data(gridData)
+        .enter().append("use")
+        .attr("xlink:href", "#personIcon")
+        .attr("id", function(d) { return "id" + d; })
+        .attr('x', function(d) { return x(d % numCols); })
+        .attr('y', function(d) { return y(Math.floor(d / numCols)); })
+        .style("fill", function(d) {
+            if (d < (data[key] * 100)) {
+                return colors[0];
+            } else {
+                return colors[1];
+            }
+        });
 }
 
 // render state charts for selected state
