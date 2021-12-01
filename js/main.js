@@ -521,7 +521,6 @@ function renderPeopleChart(data, container, colors) {
     let y = d3.scaleBand()
         .range([0, chartHeight])
         .domain(d3.range(numRows));
-
     let x = d3.scaleBand()
         .range([0, chartWidth])
         .domain(d3.range(numCols));
