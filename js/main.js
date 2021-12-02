@@ -10,6 +10,15 @@ const legendWidth = 200;
 const timeWidth = 200;
 // global to store the national data so the csv doesn't have to be loaded every time our view changes
 let nationalData = {};
+// colors for the charts showing breakdowns by age & sex
+// first color will correspond to female, second will correspond to male
+let sexColors = ["pink", "blue"];
+// first color = juvenile, second color = adult
+let ageColors = ["green", "orange"];
+// global to store the x & y scaling functions for the race chart
+let raceXScale;
+let raceYScale;
+let raceHeight;
 // global variables to determine the size of the chart container
 const chartContainerW = 800;
 
@@ -235,7 +244,7 @@ function createTimeSelect(svg) {
         .attr("transform", function(d, i) {
             return "translate(1," + (10 + i * 20) + ")";
         });
-    timeSelector.append("rect")
+    timeSelector.append("rect") // !!! we should change these to not be squares like the legend, make it look clickable
         .attr("width", 18)
         .attr("height", 18)
         .attr("class", function(d) { return "y" + d })
@@ -278,9 +287,62 @@ function changeYear(event, d) {
         .text(year + " incarceration rate");
 
     // update the charts for the new year
-
+    // update the data
+    let newData = getNationalDataForYear(year);
+    updatePeopleChart(newData["sexData"], "sex", sexColors);
+    updatePeopleChart(newData["ageData"], "age", ageColors);
+    updateBarChart(newData["raceData"]);
 }
 
+// function to update the age chart when the year is changed
+function updatePeopleChart(newData, chartName, colors) {
+    // math to figure out percentages
+    let total = 0;
+    let key; // key declared here so we can use it later to compare percentages (it's rough I know)
+    for (key in newData) {
+        total += newData[key];
+    }
+    // after looping to calculate the total, loop to calculate percentages & store them instead of the raw numbers
+    for (key in newData) {
+        newData[key] = newData[key] / total;
+    }
+
+    // select the proper chart (either sex or age)
+    let chart = d3.select("." + chartName + "Chart").select("g");
+    // select all the people & update their fills
+    chart.selectAll("use")
+        .style("fill", function(d) {
+            if (d < (newData[key] * 100)) {
+                return colors[0];
+            } else {
+                return colors[1];
+            }
+        });
+}
+
+// function to update the sex chart when the year is changed
+function updateAgeChart(newData) {
+    // select all the bars and update their data
+    let bars = d3.selectAll(".bar")
+        .data(Object.keys(newData))
+        .transition()
+        .duration(500) // time in milliseconds for graphs to transitions (e.g. 500 = 0.5 second transition)
+        .attr("y", function(d) { return raceYScale(newData[d]); })
+        .attr("height", function(d) { return raceHeight - raceYScale(newData[d]); });
+}
+
+// function to update the bar chart when the year is changed
+function updateBarChart(newData) {
+    // select all the bars and update their data
+    let bars = d3.selectAll(".bar")
+        .data(Object.keys(newData))
+        .transition()
+        .duration(500) // time in milliseconds for graphs to transitions (e.g. 500 = 0.5 second transition)
+        .attr("y", function(d) { return raceYScale(newData[d]); })
+        .attr("height", function(d) { return raceHeight - raceYScale(newData[d]); });
+}
+
+// 
 function createStateSelect(svg) {
     let stateSelectWidth = (width - timeWidth - legendWidth) / 2;
     let state1 = svg.append("svg")
@@ -307,16 +369,16 @@ function createStateSelect(svg) {
 let statesClicked = [];
 // highlight state on click logic
 function clickState(event, d) {
-    var state = d.properties.NAME
-    console.log(state)
-        // if else highlighted or not 
+    var state = d.properties.NAME;
+    // console.log(state)
+    // if else highlighted or not 
     if (statesClicked.includes(state)) {
         d3.select("." + state.replace(" ", "_"))
             .attr("id", "");
         statesClicked.splice(statesClicked.indexOf(state), 1);
     } else {
         if (statesClicked.length < 2) {
-            console.log("A:" + statesClicked.length);
+            // console.log("A:" + statesClicked.length);
             statesClicked.push(state);
             d3.select("." + state.replace(" ", "_"))
                 .attr("id", "clicked");
@@ -329,20 +391,23 @@ function clickState(event, d) {
                 .attr("id", "clicked");
         }
     }
-    console.log("Array:" + statesClicked);
-
-    console.log("Current States Selected: " + statesClicked[0] + " and " + statesClicked[1])
-    console.log(numStatesClicked);
-
-    console.log("click! " + d.properties.NAME);
-
     numStatesClicked += 1;
 
+    // logic to display helpful text when no states are selected
+    let state1Text = statesClicked[0];
+    if (!state1Text) {
+        state1Text = "Click a state to select it!";
+    }
+    let state2Text = statesClicked[1];
+    if (!state2Text) {
+        state2Text = "Select a 2nd state to compare!";
+    }
+
     d3.select(".state1")
-        .text("State 1: " + statesClicked[0]);
+        .text("State 1: " + state1Text);
 
     d3.select(".state2")
-        .text("State 2: " + statesClicked[1]);
+        .text("State 2: " + state2Text);
 }
 
 
@@ -390,11 +455,11 @@ function renderNationalCharts() {
         // render each chart
         // create svg containers for each of the 4 charts that are stacked
         let sexContainer = svg.append("svg")
-            .attr("width", chartContainerW-200)
+            .attr("width", chartContainerW - 200)
             .attr("height", height / 3)
             .attr("class", "sexChart");
         let ageContainer = svg.append("svg")
-            .attr("width", chartContainerW-200)
+            .attr("width", chartContainerW - 200)
             .attr("height", height / 3)
             .attr("transform", "translate(0," + height / 3 + ")")
             .attr("class", "ageChart");
@@ -405,14 +470,12 @@ function renderNationalCharts() {
             .attr("class", "raceChart");
 
         // chart for sex
-        let sexColor = ["blue", "pink"];
-        renderPeopleChart(sexData, sexContainer, sexColor);
-        sexLegend(svg);
+        renderPeopleChart(sexData, sexContainer, sexColors);
+        sexLegend(svg, sexColors);
 
         // chart for age
-        let ageColor = ["orange", "green"];
-        renderPeopleChart(ageData, ageContainer, ageColor);
-        ageLegend(svg);
+        renderPeopleChart(ageData, ageContainer, ageColors);
+        ageLegend(svg, ageColors);
 
         // bar chart for race
         renderRaceChart(raceData, raceContainer);
@@ -453,26 +516,26 @@ function getNationalDataForYear(year) {
 function renderRaceChart(raceData, raceContainer) {
     let margin = { top: 20, right: 20, bottom: 30, left: 70 };
     let raceWidth = raceContainer.attr("width") - margin.left - margin.right;
-    let raceHeight = raceContainer.attr("height") - margin.top - margin.bottom;
+    raceHeight = raceContainer.attr("height") - margin.top - margin.bottom;
 
-    let x = d3.scaleBand().rangeRound([0, raceWidth]).padding(0.1);
-    let y = d3.scaleLinear().rangeRound([raceHeight, 0]);
+    raceXScale = d3.scaleBand().rangeRound([0, raceWidth]).padding(0.1);
+    raceYScale = d3.scaleLinear().rangeRound([raceHeight, 0]);
 
     let g = raceContainer.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    x.domain(Object.keys(raceData));
-    y.domain([0, d3.max(Object.values(raceData))]);
+    raceXScale.domain(Object.keys(raceData));
+    raceYScale.domain([0, d3.max(Object.values(raceData))]);
 
     g.append("g")
         .attr("class", "axis axis--x")
         .attr("transform", "translate(0," + raceHeight + ")")
-        .call(d3.axisBottom(x))
+        .call(d3.axisBottom(raceXScale))
         .selectAll(".tick text")
-        .call(wrap, x.bandwidth());
+        .call(wrap, raceXScale.bandwidth());
 
     g.append("g")
         .attr("class", "axis axis--y")
-        .call(d3.axisLeft(y).ticks(10))
+        .call(d3.axisLeft(raceYScale).ticks(10))
         .append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 6)
@@ -483,12 +546,12 @@ function renderRaceChart(raceData, raceContainer) {
         .data(Object.keys(raceData))
         .enter().append("rect")
         .attr("class", "bar")
-        .attr("x", function(d) { return x(d); })
-        .attr("y", function(d) { return y(raceData[d]); })
-        .attr("width", x.bandwidth())
-        .attr("height", function(d) { return raceHeight - y(raceData[d]); })
-        .attr("id", function(d) { return d.replaceAll(" ", "_").replace("/","_") + "Bar" });
-        
+        .attr("x", function(d) { return raceXScale(d); })
+        .attr("y", function(d) { return raceYScale(raceData[d]); })
+        .attr("width", raceXScale.bandwidth())
+        .attr("height", function(d) { return raceHeight - raceYScale(raceData[d]); })
+        .attr("id", function(d) { return d.replaceAll(" ", "_").replace("/", "_") + "Bar" });
+
 }
 
 // function to separate long axis labels into multiline tspans (from Mike Bostock: https://bl.ocks.org/mbostock/7555321)
@@ -578,16 +641,13 @@ function renderComparisonCharts(state1, state2) {
 }
 
 
-function sexLegend(svg) {
+function sexLegend(svg, colors) {
     // container for the legend + legend title
     let legendContainer = svg.append("svg")
         .attr("class", "sexlegend-container")
-        .attr("transform", "translate("+(chartContainerW-200) + ",0)")
+        .attr("transform", "translate(" + (chartContainerW - 200) + ",0)")
         .attr("width", legendWidth)
         .attr("height", 200);
-
-    // text element that holds the title
-    // tspan elements to make this multiline
 
     // add an svg legend for the initial data
     // adapted from Mike Bostock: http://bl.ocks.org/mbostock/3888852
@@ -595,7 +655,7 @@ function sexLegend(svg) {
         .attr("class", "legend")
         .attr("height", legendHeight)
         .selectAll("g")
-        .data(["male", "female"])
+        .data(["Male", "Female"])
         .enter().append("g")
         .attr("transform", function(d, i) {
             return "translate(0," + (10 + i * 20) + ")";
@@ -605,12 +665,10 @@ function sexLegend(svg) {
         .attr("width", 18)
         .attr("height", 18)
         .style("fill", function(d) {
-            if (d == "male")
-            {
-                return "red"
-            }
-            else{
-                return "blue"
+            if (d == "Male") {
+                return colors[1];
+            } else {
+                return colors[0];
             }
         });
 
@@ -619,22 +677,18 @@ function sexLegend(svg) {
         .attr("y", 9)
         .attr("dy", ".35em")
         .text(function(d) {
-            // use invertExtent to go from range to domain for labels
-            return d; 
+            return d;
         });
- 
+
 }
 
-function ageLegend(svg) {
+function ageLegend(svg, colors) {
     // container for the legend + legend title
     let legendContainer = svg.append("svg")
         .attr("class", "sexlegend-container")
-        .attr("transform", "translate("+(chartContainerW-200) + ",300)")
+        .attr("transform", "translate(" + (chartContainerW - 200) + ",300)")
         .attr("width", legendWidth)
         .attr("height", 200);
-
-    // text element that holds the title
-    // tspan elements to make this multiline
 
     // add an svg legend for the initial data
     // adapted from Mike Bostock: http://bl.ocks.org/mbostock/3888852
@@ -642,7 +696,7 @@ function ageLegend(svg) {
         .attr("class", "legend")
         .attr("height", legendHeight)
         .selectAll("g")
-        .data(["Adult","Juvenile"])
+        .data(["Adult", "Juvenile"])
         .enter().append("g")
         .attr("transform", function(d, i) {
             return "translate(0," + (10 + i * 20) + ")";
@@ -652,12 +706,10 @@ function ageLegend(svg) {
         .attr("width", 18)
         .attr("height", 18)
         .style("fill", function(d) {
-            if (d == "Adult")
-            {
-                return "red"
-            }
-            else{
-                return "blue"
+            if (d == "Adult") {
+                return colors[1];
+            } else {
+                return colors[0];
             }
         });
 
@@ -666,9 +718,7 @@ function ageLegend(svg) {
         .attr("y", 9)
         .attr("dy", ".35em")
         .text(function(d) {
-            // use invertExtent to go from range to domain for labels
-            return d; 
+            return d;
         });
- 
-}
 
+}
