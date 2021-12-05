@@ -9,34 +9,34 @@
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
-#BlackBar
-{
-    fill:blueviolet;
+#BlackBar {
+    fill: blueviolet;
 }
-#WhiteBar
-{
-    fill:chocolate;
+
+#WhiteBar {
+    fill: chocolate;
 }
-#HispanicBar
-{
-    fill:cornflowerblue
+
+#HispanicBar {
+    fill: cornflowerblue
 }
-#AsianBar
-{
-    fill:darkgreen
+
+#AsianBar {
+    fill: darkgreen
 }
-#American_Indian_Alaska_NativeBar
-{
-    fill:gold
+
+#American_Indian_Alaska_NativeBar {
+    fill: gold
 }
-#Native_Hawaiian_Other_Pacific_IslanderBar
-{
-    fill:hotpink
+
+#Native_Hawaiian_Other_Pacific_IslanderBar {
+    fill: hotpink
 }
-#Two_or_more_racesBar
-{
-    fill:lawngreen
+
+#Two_or_more_racesBar {
+    fill: lawngreen
 }
+
 
 /* For when states are clicked */
 
@@ -62,11 +62,11 @@ h1 {
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     font-size: 30pt;
 }
-text
-{
+
+text {
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
-#personIcon
-{
+
+#personIcon {
     font-size: 2px;
 }

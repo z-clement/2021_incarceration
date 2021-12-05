@@ -292,7 +292,8 @@ function changeYear(event, d) {
         let newData = getNationalDataForYear(year);
         updatePeopleChart(newData["sexData"], "sex", sexColors);
         updatePeopleChart(newData["ageData"], "age", ageColors);
-        updateBarChart(newData["raceData"]);
+        updateBarChart(newData["raceData"], "bar"); // one function to update half the bars
+        updateBarChart(newData["raceData"], "bar1"); // one function to update half the bars
     }
 }
 
@@ -300,7 +301,7 @@ function changeYear(event, d) {
 function updatePeopleChart(newData, chartName, colors) {
     // math to figure out percentages
     let total = 0;
-    let key; // key declared here so we can use it later to compare percentages (it's rough I know)
+    let key; // key declared here so we can use it later to compare percentages
     for (key in newData) {
         total += newData[key];
     }
@@ -308,7 +309,6 @@ function updatePeopleChart(newData, chartName, colors) {
     for (key in newData) {
         newData[key] = newData[key] / total;
     }
-
     // select the proper chart (either sex or age)
     let chart = d3.select("." + chartName + "Chart").select("g");
     // select all the people & update their fills
@@ -323,17 +323,32 @@ function updatePeopleChart(newData, chartName, colors) {
 }
 
 // function to update the bar chart when the year is changed
-function updateBarChart(newData) {
+function updateBarChart(newData, barClass) {
     // select all the bars and update their data
-    let bars = d3.selectAll(".bar")
+    let bars = d3.selectAll("." + barClass)
         .data(Object.keys(newData))
         .transition()
         .duration(500) // time in milliseconds for graphs to transitions (e.g. 500 = 0.5 second transition)
-        .attr("y", function(d) { return raceYScale(newData[d]); })
-        .attr("height", function(d) { return raceHeight - raceYScale(newData[d]); });
-}
+        .attr("y", function(d) {
+            // check for NaN values & replace them with zero
+            let y = raceYScale(newData[d]);
+            if (y) {
+                return y;
+            } else {
+                return 0;
+            }
+        })
+        .attr("height", function(d) {
+            // check for NaN values & replace them with zero
+            let y = raceYScale(newData[d]);
+            if (!y) {
+                y = raceHeight;
+            }
+            return raceHeight - y;
+        });
+};
 
-// 
+// create the part of the interface that shows what states are selected
 function createStateSelect(svg) {
     let stateSelectWidth = (width - timeWidth - legendWidth) / 2;
     let state1 = svg.append("svg")
@@ -420,7 +435,8 @@ function clickState(event, d) {
         let newData = getNationalDataForYear(year);
         updatePeopleChart(newData["sexData"], "sex", sexColors);
         updatePeopleChart(newData["ageData"], "age", ageColors);
-        updateBarChart(newData["raceData"]);
+        updateBarChart(newData["raceData"], "bar"); // update half the bars
+        updateBarChart(newData["raceData"], "bar1"); // update the other half
     }
 }
 
@@ -528,25 +544,32 @@ function getNationalDataForYear(year) {
 
 // function to draw the race chart onto the given container
 function renderRaceChart(raceData, raceContainer) {
+    // create a margin so that labels, etc. fit on the chart
     let margin = { top: 20, right: 20, bottom: 40, left: 70 };
+    // set the width & height of the actual chart
     let raceWidth = raceContainer.attr("width") - margin.left - margin.right;
     raceHeight = raceContainer.attr("height") - margin.top - margin.bottom;
 
+    // create the x & y scales based on the width & height
     raceXScale = d3.scaleBand().rangeRound([0, raceWidth]).padding(0.1);
     raceYScale = d3.scaleLinear().rangeRound([raceHeight, 0]);
 
+    // create a container g element to hold the elements of the chart
     let g = raceContainer.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    // set the domain of the x scale based on the data, and Y scale is a percentage 0-100
     raceXScale.domain(Object.keys(raceData));
     raceYScale.domain([0, 100]);
 
+    // create the x axis & ticks
     g.append("g")
         .attr("class", "axis axis--x")
         .attr("transform", "translate(0," + raceHeight + ")")
         .call(d3.axisBottom(raceXScale))
         .selectAll(".tick text")
-        .call(wrap, raceXScale.bandwidth());
+        .call(wrap, raceXScale.bandwidth()); // wrap() helps with long labels to make them multiline
 
+    // create the y axis
     g.append("g")
         .attr("class", "axis axis--y")
         .call(d3.axisLeft(raceYScale).ticks(10))
@@ -556,13 +579,24 @@ function renderRaceChart(raceData, raceContainer) {
         .attr("dy", "0.71em")
         .attr("text-anchor", "end");
 
+    // create the actual bars on the chart based on our data
+    // two bars are used here so that we can change one bar to represent different data when a state is selected
     g.selectAll(".bar")
         .data(Object.keys(raceData))
         .enter().append("rect")
         .attr("class", "bar")
-        .attr("x", function(d) { return raceXScale(d); })
+        .attr("x", function(d) { return raceXScale(d) - 1 + raceXScale.bandwidth() / 2; }) // place the first bar to the left of the tick
         .attr("y", function(d) { return raceYScale(raceData[d]); })
-        .attr("width", raceXScale.bandwidth())
+        .attr("width", raceXScale.bandwidth() / 2 - 0.5) // make one bar only take up half the width
+        .attr("height", function(d) { return raceHeight - raceYScale(raceData[d]); })
+        .attr("id", function(d) { return d.replaceAll(" ", "_").replace("/", "_") + "Bar" });
+    g.selectAll(".bar1")
+        .data(Object.keys(raceData))
+        .enter().append("rect")
+        .attr("class", "bar1")
+        .attr("x", function(d) { return raceXScale(d) }) // place the second bar to the right of the tick
+        .attr("y", function(d) { return raceYScale(raceData[d]); })
+        .attr("width", raceXScale.bandwidth() / 2 - 0.5) // make one bar only take up half the width
         .attr("height", function(d) { return raceHeight - raceYScale(raceData[d]); })
         .attr("id", function(d) { return d.replaceAll(" ", "_").replace("/", "_") + "Bar" });
 
@@ -648,13 +682,83 @@ function renderPeopleChart(data, container, colors) {
 function renderStateCharts(statesClicked) {
     // get the data for the state that is selected
     let stateName = statesClicked[0];
+    // get the clean incarceration data
+    let stateData = cleanStateData(stateName);
+    // call the update chart functions with the state data
+    updatePeopleChart(stateData["sexData"], "sex", sexColors);
+    updatePeopleChart(stateData["ageData"], "age", ageColors);
+    updateBarChart(stateData["raceData"], "bar"); // update half the bars
+    updateBarChart(stateData["raceData"], "bar1"); // update the other half
+    changeBarOpacity("bar", 1); // make sure the bars are all colored the same
+}
+
+// render comparison charts
+function renderComparisonCharts(statesClicked) {
+    let state1 = statesClicked[0];
+    let state1Data = cleanStateData(state1);
+    let state2 = statesClicked[1];
+    let state2Data = cleanStateData(state2);
+    // make sure there are no states selected with no data
+    if (state1Data["totalIncarcerated"] && state2Data["totalIncarcerated"]) {
+        // split the sex chart in half, 50 people to represent each state
+        let sexChart = d3.select(".sexChart").select("g");
+        // select the first 50 symbols to use as state1
+        for (let i = 0; i < 50; i++) {
+            let symbol = sexChart.select("#id" + i);
+            if ((i / 50) < state1Data["sexData"]["Female"]) {
+                symbol.style("fill", "pink"); // !!! state1 female fill color set here
+            } else {
+                symbol.style("fill", "blue"); // !!! state1 male fill color set here
+            }
+        }
+        // select symbols 51-100 to use as state2
+        for (let i = 0; i < 50; i++) {
+            let symbol = sexChart.select("#id" + (i + 50));
+            if ((i / 50) < state2Data["sexData"]["Female"]) {
+                symbol.style("fill", "pink"); // !!! state2 female fill color set here
+            } else {
+                symbol.style("fill", "blue"); // !!! state2 male fill color set here
+            }
+        }
+
+        // split the age chart in half, 50 people to represent each state
+        let ageChart = d3.select(".ageChart").select("g");
+        // select the first 50 symbols to use as state1
+        for (let i = 0; i < 50; i++) {
+            let symbol = ageChart.select("#id" + i);
+            if ((i / 50) < state1Data["ageData"]["Juvenile"]) {
+                symbol.style("fill", ageColors[0]); // !!! state1 juvenile fill color set here
+            } else {
+                symbol.style("fill", ageColors[1]); // !!! state1 adult fill color set here
+            }
+        }
+        // select symbols 51-100 to use as state2
+        for (let i = 0; i < 50; i++) {
+            let symbol = ageChart.select("#id" + (i + 50));
+            if ((i / 50) < state2Data["ageData"]["Juvenile"]) {
+                symbol.style("fill", ageColors[0]); // !!! state2 juvenile fill color set here
+            } else {
+                symbol.style("fill", ageColors[1]); // !!! state2 adult fill color set here
+            }
+        }
+
+        // edit the bar chart so all bars with class .bar are state2, and all .bar1 are state1
+        updateBarChart(state2Data["raceData"], "bar"); // update half the bars
+        // change the coloring of the state2 bars just by changing the alpha
+        changeBarOpacity("bar", 0.5);
+        updateBarChart(state1Data["raceData"], "bar1"); // update the other half
+    }
+}
+
+// get the incarceration data for a state from the map & format it to work with the charts
+function cleanStateData(stateName) {
     // find the state within the map & get the json object
     let state = d3.select("." + stateName.replace(" ", "_")).datum();
     // pull the sex, age, and race data out & make it formatted the same way the national data is
     let totalInmates = state["2019_inmates_in_custody"];
     let sexData = {
-        "Male": state["pct_male"],
-        "Female": state["pct_female"]
+        "Male": state["pct_male"] / 100,
+        "Female": state["pct_female"] / 100
     };
     // the age data is supposed to be in percentages, so use the total incarcerated to get %
     let ageData = {
@@ -670,20 +774,20 @@ function renderStateCharts(statesClicked) {
         "Two or more races": state["pct_two_race"],
         "White": state["pct_white"]
     };
-    // check that we haven't clicked a state with no data, & if we have, don't update the charts
-    if (totalInmates) {
-        // call the update chart functions with the state data
-        updatePeopleChart(sexData, "sex", sexColors);
-        updatePeopleChart(ageData, "age", ageColors);
-        updateBarChart(raceData);
+
+    return {
+        "totalIncarcerated": totalInmates,
+        "sexData": sexData,
+        "ageData": ageData,
+        "raceData": raceData
     }
 }
 
-// render comparison charts
-function renderComparisonCharts(statesClicked) {
-
+// function to change the opacity of some bars on the bar chart
+function changeBarOpacity(barClass, opacity) {
+    d3.selectAll("." + barClass)
+        .style("opacity", opacity);
 }
-
 
 function sexLegend(svg, colors) {
     // container for the legend + legend title
