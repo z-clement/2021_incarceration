@@ -670,11 +670,13 @@ function renderStateCharts(statesClicked) {
         "Two or more races": state["pct_two_race"],
         "White": state["pct_white"]
     };
-    console.log(raceData);
-    // call the update chart functions with the state data
-    updatePeopleChart(sexData, "sex", sexColors);
-    updatePeopleChart(ageData, "age", ageColors);
-    updateBarChart(raceData);
+    // check that we haven't clicked a state with no data, & if we have, don't update the charts
+    if (totalInmates) {
+        // call the update chart functions with the state data
+        updatePeopleChart(sexData, "sex", sexColors);
+        updatePeopleChart(ageData, "age", ageColors);
+        updateBarChart(raceData);
+    }
 }
 
 // render comparison charts
