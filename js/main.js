@@ -12,9 +12,9 @@ const timeWidth = 200;
 let nationalData = {};
 // colors for the charts showing breakdowns by age & sex
 // first color will correspond to female, second will correspond to male
-let sexColors = ["pink", "blue"];
+const sexColors = ["pink", "blue"];
 // first color = juvenile, second color = adult
-let ageColors = ["green", "orange"];
+const ageColors = ["green", "orange"];
 // global to store the x & y scaling functions for the race chart
 let raceXScale;
 let raceYScale;
@@ -48,7 +48,7 @@ function renderMap() {
 
     // load in the geoJSON data
     d3.json("data/better-states.json").then(function(data) {
-        console.log(incarcerationData)
+        // console.log(incarcerationData)
 
         // loop through each state & append the incarceration data
         for (let i = 0; i < data.features.length; i++) {
@@ -268,30 +268,32 @@ function createTimeSelect(svg) {
 
 // change year when box is clicked
 function changeYear(event, d) {
-    let year = d;
-    // deselect the current year that is selected
-    d3.select("#selected")
-        .attr("id", "");
-    // add the "selected" id to the year that is clicked
-    d3.select(".y" + year)
-        .attr("id", "selected");
-    // adjust the fill for all the states based on the data from the year that's selected
-    d3.selectAll(".state")
-        .style("fill", function(d) {
-            let color = colorScale(d[year + "_incarceration_rate"]);
-            color = color ? color : "#ccc";
-            return color
-        });
-    // update the legend title to reflect which year is selected (maybe not needed?)
-    d3.select(".legend-title").select("tspan")
-        .text(year + " incarceration rate");
+    // update the the map & charts for the new year, only if no states are selected
+    if (statesClicked.length == 0) {
+        let year = d;
+        // deselect the current year that is selected
+        d3.select("#selected")
+            .attr("id", "");
+        // add the "selected" id to the year that is clicked
+        d3.select(".y" + year)
+            .attr("id", "selected");
+        // adjust the fill for all the states based on the data from the year that's selected
+        d3.selectAll(".state")
+            .style("fill", function(d) {
+                let color = colorScale(d[year + "_incarceration_rate"]);
+                color = color ? color : "#ccc";
+                return color
+            });
+        // update the legend title to reflect which year is selected (maybe not needed?)
+        d3.select(".legend-title").select("tspan")
+            .text(year + " incarceration rate");
 
-    // update the charts for the new year
-    // update the data
-    let newData = getNationalDataForYear(year);
-    updatePeopleChart(newData["sexData"], "sex", sexColors);
-    updatePeopleChart(newData["ageData"], "age", ageColors);
-    updateBarChart(newData["raceData"]);
+        // update the data
+        let newData = getNationalDataForYear(year);
+        updatePeopleChart(newData["sexData"], "sex", sexColors);
+        updatePeopleChart(newData["ageData"], "age", ageColors);
+        updateBarChart(newData["raceData"]);
+    }
 }
 
 // function to update the age chart when the year is changed
@@ -318,17 +320,6 @@ function updatePeopleChart(newData, chartName, colors) {
                 return colors[1];
             }
         });
-}
-
-// function to update the sex chart when the year is changed
-function updateAgeChart(newData) {
-    // select all the bars and update their data
-    let bars = d3.selectAll(".bar")
-        .data(Object.keys(newData))
-        .transition()
-        .duration(500) // time in milliseconds for graphs to transitions (e.g. 500 = 0.5 second transition)
-        .attr("y", function(d) { return raceYScale(newData[d]); })
-        .attr("height", function(d) { return raceHeight - raceYScale(newData[d]); });
 }
 
 // function to update the bar chart when the year is changed
@@ -373,6 +364,7 @@ function clickState(event, d) {
     // console.log(state)
     // if else highlighted or not 
     if (statesClicked.includes(state)) {
+        // unselect the state that's clicked
         d3.select("." + state.replace(" ", "_"))
             .attr("id", "");
         statesClicked.splice(statesClicked.indexOf(state), 1);
@@ -393,6 +385,8 @@ function clickState(event, d) {
     }
     numStatesClicked += 1;
 
+    /// !!! add something that forces the year to be 2019 if there are states selected
+
     // logic to display helpful text when no states are selected
     let state1Text = statesClicked[0];
     if (!state1Text) {
@@ -408,6 +402,26 @@ function clickState(event, d) {
 
     d3.select(".state2")
         .text("State 2: " + state2Text);
+
+    // logic for updating the graphs depending on how many states are clicked
+    // if there's only one state, update the graphs to show the state's data
+    if (statesClicked.length == 1) {
+        // update the charts with different data
+        renderStateCharts(statesClicked);
+    } else if (statesClicked.length == 2) {
+        // change the chart view to a comparison view
+        renderComparisonCharts(statesClicked);
+    } else {
+        // make sure the national charts are showing
+        // get the current year from the time selector
+        let year = d3.select(".time-container").select("#selected").attr("class");
+        // year is in the formatted like "y2019", so take off the "y"
+        year = year.substring(1);
+        let newData = getNationalDataForYear(year);
+        updatePeopleChart(newData["sexData"], "sex", sexColors);
+        updatePeopleChart(newData["ageData"], "age", ageColors);
+        updateBarChart(newData["raceData"]);
+    }
 }
 
 
@@ -429,7 +443,6 @@ function renderNationalCharts() {
         //.style("font-size",2);
         // import national data
     d3.csv("data/national_data.csv").then(function(data) {
-        // console.log(data);
         // sort the nationalData into a dictionary that's easier to work with
         for (i = 0; i < data.length; i++) {
             let demographic = data[i]["Demographic"];
@@ -442,16 +455,12 @@ function renderNationalCharts() {
                 nationalData[demographic][key] = Number(data[i][key].replace(/,/g, '')); // the .replace is used to format the numbers from strings
             }
         }
-        console.log(nationalData);
         // get the relevant data for the charts, for the default year of 2019
         // we want sex, age, race & ethnicity
         let data2019 = getNationalDataForYear("2019")
         let sexData = data2019.sexData;
         let ageData = data2019.ageData;
         let raceData = data2019.raceData;
-        // console.log(sexData);
-        // console.log(ageData);
-        // console.log(raceData);
 
         // render each chart
         // create svg containers for each of the 4 charts that are stacked
@@ -505,6 +514,10 @@ function getNationalDataForYear(year) {
         "Two or more races": nationalData["Two or more races"][yearString],
         "White": nationalData["White"][yearString]
     };
+    // get the race data to be percentages instead of raw numbers
+    for (key in raceData) {
+        raceData[key] = (raceData[key] / totalIncarcerated) * 100;
+    }
     return {
         "totalIncarcerated": totalIncarcerated,
         "sexData": sexData,
@@ -515,7 +528,7 @@ function getNationalDataForYear(year) {
 
 // function to draw the race chart onto the given container
 function renderRaceChart(raceData, raceContainer) {
-    let margin = { top: 20, right: 20, bottom: 30, left: 70 };
+    let margin = { top: 20, right: 20, bottom: 40, left: 70 };
     let raceWidth = raceContainer.attr("width") - margin.left - margin.right;
     raceHeight = raceContainer.attr("height") - margin.top - margin.bottom;
 
@@ -525,7 +538,7 @@ function renderRaceChart(raceData, raceContainer) {
     let g = raceContainer.append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     raceXScale.domain(Object.keys(raceData));
-    raceYScale.domain([0, d3.max(Object.values(raceData))]);
+    raceYScale.domain([0, 100]);
 
     g.append("g")
         .attr("class", "axis axis--x")
@@ -632,12 +645,40 @@ function renderPeopleChart(data, container, colors) {
 }
 
 // render state charts for selected state
-function renderStateCharts(state) {
-
+function renderStateCharts(statesClicked) {
+    // get the data for the state that is selected
+    let stateName = statesClicked[0];
+    // find the state within the map & get the json object
+    let state = d3.select("." + stateName.replace(" ", "_")).datum();
+    // pull the sex, age, and race data out & make it formatted the same way the national data is
+    let totalInmates = state["2019_inmates_in_custody"];
+    let sexData = {
+        "Male": state["pct_male"],
+        "Female": state["pct_female"]
+    };
+    // the age data is supposed to be in percentages, so use the total incarcerated to get %
+    let ageData = {
+        "Adults": (state["adult_total"] / totalInmates),
+        "Juvenile": (1 - (state["adult_total"] / totalInmates))
+    };
+    let raceData = {
+        "American Indian/Alaska Native": state["pct_native_indian"],
+        "Asian": state["pct_asian"],
+        "Black": state["pct_black"],
+        "Hispanic": state["pct_hispanic"],
+        "Native Hawaiian/Other Pacific Islander": state["pct_islander"],
+        "Two or more races": state["pct_two_race"],
+        "White": state["pct_white"]
+    };
+    console.log(raceData);
+    // call the update chart functions with the state data
+    updatePeopleChart(sexData, "sex", sexColors);
+    updatePeopleChart(ageData, "age", ageColors);
+    updateBarChart(raceData);
 }
 
 // render comparison charts
-function renderComparisonCharts(state1, state2) {
+function renderComparisonCharts(statesClicked) {
 
 }
 
