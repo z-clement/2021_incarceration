@@ -10,6 +10,8 @@ const legendWidth = 200;
 const timeWidth = 200;
 // global to store the national data so the csv doesn't have to be loaded every time our view changes
 let nationalData = {};
+// variable to track which states are clicked
+let statesClicked = [];
 // colors for the charts showing breakdowns by age & sex
 // first color will correspond to female, second will correspond to male
 const sexColors = ["pink", "blue"];
@@ -253,7 +255,10 @@ function createTimeSelect(svg) {
         .style("outline-offset", "-1px")
         .style("fill", "white")
         .on("click", function(event, d) {
-            changeYear(event, d);
+            // only update the year if there are no states clicked
+            if (statesClicked.length == 0) {
+                changeYear(event, d);
+            }
         });
     timeSelector.append("text")
         .attr("x", 24)
@@ -268,33 +273,31 @@ function createTimeSelect(svg) {
 
 // change year when box is clicked
 function changeYear(event, d) {
-    // update the the map & charts for the new year, only if no states are selected
-    if (statesClicked.length == 0) {
-        let year = d;
-        // deselect the current year that is selected
-        d3.select("#selected")
-            .attr("id", "");
-        // add the "selected" id to the year that is clicked
-        d3.select(".y" + year)
-            .attr("id", "selected");
-        // adjust the fill for all the states based on the data from the year that's selected
-        d3.selectAll(".state")
-            .style("fill", function(d) {
-                let color = colorScale(d[year + "_incarceration_rate"]);
-                color = color ? color : "#ccc";
-                return color
-            });
-        // update the legend title to reflect which year is selected (maybe not needed?)
-        d3.select(".legend-title").select("tspan")
-            .text(year + " incarceration rate");
+    // update the the map & charts for the new year
+    let year = d;
+    // deselect the current year that is selected
+    d3.select("#selected")
+        .attr("id", "");
+    // add the "selected" id to the year that is clicked
+    d3.select(".y" + year)
+        .attr("id", "selected");
+    // adjust the fill for all the states based on the data from the year that's selected
+    d3.selectAll(".state")
+        .style("fill", function(d) {
+            let color = colorScale(d[year + "_incarceration_rate"]);
+            color = color ? color : "#ccc";
+            return color
+        });
+    // update the legend title to reflect which year is selected
+    d3.select(".legend-title").select("tspan")
+        .text(year + " incarceration rate");
 
-        // update the data
-        let newData = getNationalDataForYear(year);
-        updatePeopleChart(newData["sexData"], "sex", sexColors);
-        updatePeopleChart(newData["ageData"], "age", ageColors);
-        updateBarChart(newData["raceData"], "bar"); // one function to update half the bars
-        updateBarChart(newData["raceData"], "bar1"); // one function to update half the bars
-    }
+    // update the data
+    let newData = getNationalDataForYear(year);
+    updatePeopleChart(newData["sexData"], "sex", sexColors);
+    updatePeopleChart(newData["ageData"], "age", ageColors);
+    updateBarChart(newData["raceData"], "bar"); // one function to update half the bars
+    updateBarChart(newData["raceData"], "bar1"); // one function to update half the bars
 }
 
 // function to update the age chart when the year is changed
@@ -372,7 +375,6 @@ function createStateSelect(svg) {
         .text("State 2: Select a 2nd state to compare!");
 }
 
-let statesClicked = [];
 // highlight state on click logic
 function clickState(event, d) {
     var state = d.properties.NAME;
@@ -420,6 +422,23 @@ function clickState(event, d) {
 
     // logic for updating the graphs depending on how many states are clicked
     // if there's only one state, update the graphs to show the state's data
+    // make sure the map is set to show 2019 data
+    // deselect the current year that is selected
+    d3.select("#selected")
+        .attr("id", "");
+    // add the "selected" id to the year that is clicked
+    d3.select(".y" + 2019)
+        .attr("id", "selected");
+    // adjust the fill for all the states based on the data from the year that's selected
+    d3.selectAll(".state")
+        .style("fill", function(d) {
+            let color = colorScale(d["2019_incarceration_rate"]);
+            color = color ? color : "#ccc";
+            return color
+        });
+    // update the legend title to reflect which year is selected
+    d3.select(".legend-title").select("tspan")
+        .text("2019 incarceration rate");
     if (statesClicked.length == 1) {
         // update the charts with different data
         renderStateCharts(statesClicked);
@@ -427,16 +446,7 @@ function clickState(event, d) {
         // change the chart view to a comparison view
         renderComparisonCharts(statesClicked);
     } else {
-        // make sure the national charts are showing
-        // get the current year from the time selector
-        let year = d3.select(".time-container").select("#selected").attr("class");
-        // year is in the formatted like "y2019", so take off the "y"
-        year = year.substring(1);
-        let newData = getNationalDataForYear(year);
-        updatePeopleChart(newData["sexData"], "sex", sexColors);
-        updatePeopleChart(newData["ageData"], "age", ageColors);
-        updateBarChart(newData["raceData"], "bar"); // update half the bars
-        updateBarChart(newData["raceData"], "bar1"); // update the other half
+        changeYear(null, "2019");
     }
 }
 
@@ -590,6 +600,7 @@ function renderRaceChart(raceData, raceContainer) {
         .attr("width", raceXScale.bandwidth() / 2 - 0.5) // make one bar only take up half the width
         .attr("height", function(d) { return raceHeight - raceYScale(raceData[d]); })
         .attr("id", function(d) { return d.replaceAll(" ", "_").replace("/", "_") + "Bar" });
+    // !!! add a mouseover tooltip for the race data
     g.selectAll(".bar1")
         .data(Object.keys(raceData))
         .enter().append("rect")
@@ -599,7 +610,6 @@ function renderRaceChart(raceData, raceContainer) {
         .attr("width", raceXScale.bandwidth() / 2 - 0.5) // make one bar only take up half the width
         .attr("height", function(d) { return raceHeight - raceYScale(raceData[d]); })
         .attr("id", function(d) { return d.replaceAll(" ", "_").replace("/", "_") + "Bar" });
-
 }
 
 // function to separate long axis labels into multiline tspans (from Mike Bostock: https://bl.ocks.org/mbostock/7555321)
@@ -676,6 +686,7 @@ function renderPeopleChart(data, container, colors) {
                 return colors[1];
             }
         });
+    // !!! add mouseover event for the people charts
 }
 
 // render state charts for selected state
