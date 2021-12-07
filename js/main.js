@@ -32,7 +32,7 @@ function renderMap() {
         .append("svg")
         .attr("class", "container")
         .attr("width", window.screen.width - margin * 2)
-        .attr("height", window.screen.height - margin * 2 - titleHeight)
+        .attr("height", document.documentElement.scrollHeight - margin * 2 - titleHeight)
         .attr("translate", "transform(" + (margin * 2) + "," + (margin * 2 - titleHeight) + ")");
     // an svg container to hold all of the elements related to the map
     let mapContainer = screenContainer.append("svg")
@@ -186,7 +186,7 @@ function createLegend(svg, yearData) {
     let legend = legendContainer.append("svg")
         .attr("class", "legend")
         .attr("height", legendContainer.attr("height"))
-        .attr("y", titleHeight)
+        .attr("y", legendContainer.select(".legend-title").node().getBoundingClientRect().height - 5)
         .selectAll("g")
         .data(colorScale.range().slice().reverse())
         .enter().append("g")
@@ -214,7 +214,7 @@ function createLegend(svg, yearData) {
     let extraBox = legendContainer.append("svg")
         .attr("class", "extra-box")
         .attr("height", 20)
-        .attr("y", (colorScale.range().length + 2.8) * 20);
+        .attr("y", legend.attr("y") + (colorScale.range().length) * 30);
     extraBox.append("rect")
         .attr("width", 18)
         .attr("height", 18)
@@ -968,11 +968,11 @@ function sexLegend(svg, colors) {
     // add a legend elemnent indicating what one icon represents
     legend.append("use")
         .attr("xlink:href", "#personIcon")
-        .attr("y", 60);
+        .attr("y", legend.select("g").node().getBoundingClientRect().height * 2.5);
     legend.append("text")
         .attr("class", "people-scale")
         .attr("x", 23)
-        .attr("y", 70)
+        .attr("y", legend.select("g").node().getBoundingClientRect().height * 3)
         .attr("dy", ".35em")
         .text("= 1 person");
 }
