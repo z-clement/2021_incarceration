@@ -834,7 +834,7 @@ function renderComparisonCharts(statesClicked) {
         for (let i = 0; i < 50; i++) {
             let symbol = sexChart.select("#id" + (i + 50));
             if ((i / 50) < state2Data["sexData"]["Female"]) {
-                symbol.style("fill", "pink"); // !!! state2 female fill color set here
+                symbol.style("fill", "hotpink"); // !!! state2 female fill color set here
             } else {
                 symbol.style("fill", "blue"); // !!! state2 male fill color set here
             }
