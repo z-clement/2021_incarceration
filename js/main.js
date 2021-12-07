@@ -10,7 +10,7 @@ let statesClicked = [];
 // first color will correspond to female, second will correspond to male
 const sexColors = ["hotpink", "blue"];
 // first color = juvenile, second color = adult
-const ageColors = ["green", "darkorange"];
+const ageColors = ["darkorange", "green"];
 // global to store the x & y scaling functions for the race chart
 let raceXScale;
 let raceYScale;
