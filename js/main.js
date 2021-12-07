@@ -481,7 +481,7 @@ function clickState(event, d) {
         d3.select(".ageChart-title").text(oldTitle.replace("State", "National"));
         // update the scale of the person symbol
         let oldText = d3.select(".people-scale").text();
-        d3.select(".people-scale").text(oldText.replace("2 people", "1 person"));
+        d3.select(".people-scale").text(oldText.replace("2% inmates", "1% inmates"));
         // finally raceChart
         oldTitle = d3.select(".raceChart-title").text();
         d3.select(".raceChart-title").text(oldTitle.replace("State", "National"));
@@ -778,7 +778,7 @@ function renderStateCharts(statesClicked) {
     updatePeopleChart(stateData["ageData"], "age", ageColors);
     // update the scale of the person symbol
     let oldText = d3.select(".people-scale").text();
-    d3.select(".people-scale").text(oldText.replace("2 people", "1 person"));
+    d3.select(".people-scale").text(oldText.replace("2% inmates", "1% inmates"));
     // update the chart name to say "State"
     oldTitle = d3.select(".ageChart-title").text();
     d3.select(".ageChart-title").text(oldTitle.replace("National", "State"))
@@ -861,7 +861,7 @@ function renderComparisonCharts(statesClicked) {
     // update the scale of the person if 2 states are succesfully selected
     if (state1Data["totalIncarcerated"] && state2Data["totalIncarcerated"]) {
         let oldText = d3.select(".people-scale").text();
-        d3.select(".people-scale").text(oldText.replace("1 person", "2 people"));
+        d3.select(".people-scale").text(oldText.replace("1% inmates", "2% inmates"));
     }
 }
 
@@ -974,7 +974,7 @@ function sexLegend(svg, colors) {
         .attr("x", 23)
         .attr("y", legend.select("g").node().getBoundingClientRect().height * 3)
         .attr("dy", ".35em")
-        .text("= 1 person");
+        .text("= 1% inmates");
 }
 
 function ageLegend(svg, colors) {
