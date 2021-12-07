@@ -614,6 +614,11 @@ function renderRaceChart(raceData, raceContainer) {
     raceXScale.domain(Object.keys(raceData));
     raceYScale.domain([0, 100]);
 
+    // create a tooltip for the race hover
+    let raceTooltip = d3.select("body").append("div").attr("class", "toolTip");
+    d3.select("body").append("div").attr("class", "toolTip").attr("id", "bar");
+    d3.select("body").append("div").attr("class", "toolTip").attr("id", "bar1");
+
     // create the x axis & ticks
     g.append("g")
         .attr("class", "axis axis--x")
@@ -644,8 +649,19 @@ function renderRaceChart(raceData, raceContainer) {
         .attr("y", function(d) { return raceYScale(raceData[d]); })
         .attr("width", raceXScale.bandwidth() / 2 - 0.5) // make one bar only take up half the width
         .attr("height", function(d) { return raceHeight - raceYScale(raceData[d]); })
-        .attr("id", function(d) { return d.replaceAll(" ", "_").replace("/", "_") + "Bar" });
-    // !!! add a mouseover tooltip for the race data
+        .attr("id", function(d) { return d.replaceAll(" ", "_").replace("/", "_") + "Bar" })
+        .on("mouseover", function(event, d) {
+            let race = d.replaceAll(" ", "_").replace("/", "_");
+            let barHeight = d3.select("#" + race + "Bar.bar").attr("height");
+            let percentage = Math.round((100 - raceYScale.invert(barHeight)) * 100) / 100;
+            let stateName = d3.select("#bar").html();
+            raceTooltip.style("left", event.pageX - 50 + "px")
+                .style("top", event.pageY - 70 + "px")
+                .style("display", "inline-block")
+                .html(stateName + percentage + "% " + d);
+        })
+        .on("mouseout", function(d) { raceTooltip.style("display", "none"); });
+
     g.selectAll(".bar1")
         .data(Object.keys(raceData))
         .enter().append("rect")
@@ -654,7 +670,18 @@ function renderRaceChart(raceData, raceContainer) {
         .attr("y", function(d) { return raceYScale(raceData[d]); })
         .attr("width", raceXScale.bandwidth() / 2 - 0.5) // make one bar only take up half the width
         .attr("height", function(d) { return raceHeight - raceYScale(raceData[d]); })
-        .attr("id", function(d) { return d.replaceAll(" ", "_").replace("/", "_") + "Bar" });
+        .attr("id", function(d) { return d.replaceAll(" ", "_").replace("/", "_") + "Bar" })
+        .on("mouseover", function(event, d) {
+            let race = d.replaceAll(" ", "_").replace("/", "_");
+            let barHeight = d3.selectAll("#" + race + "Bar.bar1").attr("height");
+            let percentage = Math.round((100 - raceYScale.invert(barHeight)) * 100) / 100;
+            let stateName = d3.select("#bar1").html();
+            raceTooltip.style("left", event.pageX - 50 + "px")
+                .style("top", event.pageY - 70 + "px")
+                .style("display", "inline-block")
+                .html(stateName + percentage + "% " + d);
+        })
+        .on("mouseout", function(d) { raceTooltip.style("display", "none"); });;
 
     // add a title to the race chart
     let title = raceContainer.append("svg")
@@ -862,6 +889,10 @@ function renderComparisonCharts(statesClicked) {
     if (state1Data["totalIncarcerated"] && state2Data["totalIncarcerated"]) {
         let oldText = d3.select(".people-scale").text();
         d3.select(".people-scale").text(oldText.replace("1 person", "2 people"));
+        // update the tooltip
+        let oldTooltip = d3.select(".toolTip").html();
+        d3.select("#bar1").html(state1 + ": ");
+        d3.select("#bar").html(state2 + ": ");
     }
 }
 

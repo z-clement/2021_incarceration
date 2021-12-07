@@ -84,3 +84,14 @@ text {
 #personIcon {
     font-size: 2px;
 }
+
+.toolTip {
+    position: absolute;
+    display: none;
+    min-width: 60px;
+    height: auto;
+    background: none repeat scroll 0 0 #ffffff;
+    border: 1px solid #6F257F;
+    padding: 8px;
+    text-align: center;
+}
