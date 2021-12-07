@@ -8,7 +8,7 @@ let nationalData = {};
 let statesClicked = [];
 // colors for the charts showing breakdowns by age & sex
 // first color will correspond to female, second will correspond to male
-const sexColors = ["hotpink", "blue"];
+const sexColors = ["hotpink", "dodgerblue"];
 // first color = juvenile, second color = adult
 const ageColors = ["darkorange", "green"];
 // global to store the x & y scaling functions for the race chart
@@ -387,8 +387,8 @@ function createStateSelect(svg) {
         .text("State 2: Select a 2nd state to compare!")
         .call(wrap, state2.attr("width"));
     let message = svg.append("svg")
-        .attr("transform", "translate(" + stateSelectWidth * 2 + "," + d3.select(".borderContainer").attr("height") + ")")
-        .attr("width", stateSelectWidth * 1.9)
+        .attr("transform", "translate(" + stateSelectWidth * 2.25 + "," + d3.select(".borderContainer").attr("height") + ")")
+        .attr("width", stateSelectWidth)
         .attr("height", svg.attr("height") - d3.select(".borderContainer").attr("height"));
     message.append("text")
         .attr("class", "message")
@@ -810,7 +810,7 @@ function renderComparisonCharts(statesClicked) {
             if ((i / 50) < state1Data["sexData"]["Female"]) {
                 symbol.style("fill", "hotpink"); // !!! state1 female fill color set here
             } else {
-                symbol.style("fill", "blue"); // !!! state1 male fill color set here
+                symbol.style("fill", "dodgerblue"); // !!! state1 male fill color set here
             }
         }
         // add a label for state1
@@ -836,7 +836,7 @@ function renderComparisonCharts(statesClicked) {
             if ((i / 50) < state2Data["sexData"]["Female"]) {
                 symbol.style("fill", "hotpink"); // !!! state2 female fill color set here
             } else {
-                symbol.style("fill", "blue"); // !!! state2 male fill color set here
+                symbol.style("fill", "dodgerblue"); // !!! state2 male fill color set here
             }
         }
         // select symbols 51-100 to use as state2
