@@ -386,6 +386,18 @@ function createStateSelect(svg) {
         .attr("dy", "1em")
         .text("State 2: Select a 2nd state to compare!")
         .call(wrap, state2.attr("width"));
+    let message = svg.append("svg")
+        .attr("transform", "translate(" + stateSelectWidth * 2.5 + "," + d3.select(".borderContainer").attr("height") + ")")
+        .attr("width", stateSelectWidth)
+        .attr("height", svg.attr("height") - d3.select(".borderContainer").attr("height"));
+    message.append("text")
+        .attr("class", "message")
+        .attr("x", 10)
+        .attr("y", 80)
+        .attr("dy", "1em")
+        .text("Note: State level demographic data is only available for 2019. All states must be deselected (click a selected state to deselect) in order to alter year selection.")
+        .call(wrap, message.attr("width"));
+
 }
 
 // highlight state on click logic
