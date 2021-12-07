@@ -387,8 +387,8 @@ function createStateSelect(svg) {
         .text("State 2: Select a 2nd state to compare!")
         .call(wrap, state2.attr("width"));
     let message = svg.append("svg")
-        .attr("transform", "translate(" + stateSelectWidth * 2.25 + "," + d3.select(".borderContainer").attr("height") + ")")
-        .attr("width", stateSelectWidth)
+        .attr("transform", "translate(" + stateSelectWidth * 2 + "," + d3.select(".borderContainer").attr("height") + ")")
+        .attr("width", stateSelectWidth * 1.9)
         .attr("height", svg.attr("height") - d3.select(".borderContainer").attr("height"));
     message.append("text")
         .attr("class", "message")
