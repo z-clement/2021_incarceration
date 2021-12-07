@@ -427,8 +427,6 @@ function clickState(event, d) {
     }
     numStatesClicked += 1;
 
-    /// !!! add something that forces the year to be 2019 if there are states selected
-
     // logic to display helpful text when no states are selected
     let state1Text = statesClicked[0];
     if (!state1Text) {
@@ -481,6 +479,9 @@ function clickState(event, d) {
         // now ageChart
         oldTitle = d3.select(".ageChart-title").text();
         d3.select(".ageChart-title").text(oldTitle.replace("State", "National"));
+        // update the scale of the person symbol
+        let oldText = d3.select(".people-scale").text();
+        d3.select(".people-scale").text(oldText.replace("2 people", "1 person"));
         // finally raceChart
         oldTitle = d3.select(".raceChart-title").text();
         d3.select(".raceChart-title").text(oldTitle.replace("State", "National"));
@@ -775,6 +776,9 @@ function renderStateCharts(statesClicked) {
     let oldTitle = d3.select(".sexChart-title").text();
     d3.select(".sexChart-title").text(oldTitle.replace("National", "State"))
     updatePeopleChart(stateData["ageData"], "age", ageColors);
+    // update the scale of the person symbol
+    let oldText = d3.select(".people-scale").text();
+    d3.select(".people-scale").text(oldText.replace("2 people", "1 person"));
     // update the chart name to say "State"
     oldTitle = d3.select(".ageChart-title").text();
     d3.select(".ageChart-title").text(oldTitle.replace("National", "State"))
@@ -792,10 +796,14 @@ function renderComparisonCharts(statesClicked) {
     let state1Data = cleanStateData(state1);
     let state2 = statesClicked[1];
     let state2Data = cleanStateData(state2);
+
+    // split the sex chart in half, 50 people to represent each state
+    let sexChart = d3.select(".sexChart").select("g");
+    // split the age chart in half, 50 people to represent each state
+    let ageChart = d3.select(".ageChart").select("g");
+
     // make sure there are no states selected with no data
-    if (state1Data["totalIncarcerated"] && state2Data["totalIncarcerated"]) {
-        // split the sex chart in half, 50 people to represent each state
-        let sexChart = d3.select(".sexChart").select("g");
+    if (state1Data["totalIncarcerated"]) {
         // select the first 50 symbols to use as state1
         for (let i = 0; i < 50; i++) {
             let symbol = sexChart.select("#id" + i);
@@ -805,21 +813,10 @@ function renderComparisonCharts(statesClicked) {
                 symbol.style("fill", "blue"); // !!! state1 male fill color set here
             }
         }
-        // select symbols 51-100 to use as state2
-        for (let i = 0; i < 50; i++) {
-            let symbol = sexChart.select("#id" + (i + 50));
-            if ((i / 50) < state2Data["sexData"]["Female"]) {
-                symbol.style("fill", "pink"); // !!! state2 female fill color set here
-            } else {
-                symbol.style("fill", "blue"); // !!! state2 male fill color set here
-            }
-        }
         // add a label for state1
         d3.selectAll(".state1-label").text(state1)
             .call(wrap, d3.select(".sexlegend-container").attr("width"));
 
-        // split the age chart in half, 50 people to represent each state
-        let ageChart = d3.select(".ageChart").select("g");
         // select the first 50 symbols to use as state1
         for (let i = 0; i < 50; i++) {
             let symbol = ageChart.select("#id" + i);
@@ -827,6 +824,19 @@ function renderComparisonCharts(statesClicked) {
                 symbol.style("fill", ageColors[0]); // !!! state1 juvenile fill color set here
             } else {
                 symbol.style("fill", ageColors[1]); // !!! state1 adult fill color set here
+            }
+        }
+        // edit the bar chart so all bars with class .bar are state2, and all .bar1 are state1
+        updateBarChart(state1Data["raceData"], "bar1");
+    }
+    if (state2Data["totalIncarcerated"]) {
+        // select symbols 51-100 to use as state2
+        for (let i = 0; i < 50; i++) {
+            let symbol = sexChart.select("#id" + (i + 50));
+            if ((i / 50) < state2Data["sexData"]["Female"]) {
+                symbol.style("fill", "pink"); // !!! state2 female fill color set here
+            } else {
+                symbol.style("fill", "blue"); // !!! state2 male fill color set here
             }
         }
         // select symbols 51-100 to use as state2
@@ -846,7 +856,12 @@ function renderComparisonCharts(statesClicked) {
         updateBarChart(state2Data["raceData"], "bar"); // update half the bars
         // change the coloring of the state2 bars just by changing the alpha
         changeBarOpacity("bar", 0.5);
-        updateBarChart(state1Data["raceData"], "bar1"); // update the other half
+    }
+
+    // update the scale of the person if 2 states are succesfully selected
+    if (state1Data["totalIncarcerated"] && state2Data["totalIncarcerated"]) {
+        let oldText = d3.select(".people-scale").text();
+        d3.select(".people-scale").text(oldText.replace("1 person", "2 people"));
     }
 }
 
@@ -922,15 +937,16 @@ function sexLegend(svg, colors) {
     let legend = legendContainer.append("svg")
         .attr("class", "legend")
         .attr("height", chartHeight / 3)
-        .attr("y", 2 * chartHeight / 3 - 15)
-        .selectAll("g")
+        .attr("y", 2 * chartHeight / 3 - 15);
+
+    let legendGroups = legend.selectAll("g")
         .data(["Male", "Female"])
         .enter().append("g")
         .attr("transform", function(d, i) {
             return "translate(0," + (10 + i * 20) + ")";
         });
 
-    legend.append("rect")
+    legendGroups.append("rect")
         .attr("width", 18)
         .attr("height", 18)
         .style("fill", function(d) {
@@ -941,13 +957,24 @@ function sexLegend(svg, colors) {
             }
         });
 
-    legend.append("text")
+    legendGroups.append("text")
         .attr("x", 24)
         .attr("y", 9)
         .attr("dy", ".35em")
         .text(function(d) {
             return d;
         });
+
+    // add a legend elemnent indicating what one icon represents
+    legend.append("use")
+        .attr("xlink:href", "#personIcon")
+        .attr("y", 60);
+    legend.append("text")
+        .attr("class", "people-scale")
+        .attr("x", 23)
+        .attr("y", 70)
+        .attr("dy", ".35em")
+        .text("= 1 person");
 }
 
 function ageLegend(svg, colors) {
