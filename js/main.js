@@ -395,7 +395,7 @@ function createStateSelect(svg) {
         .attr("x", 10)
         .attr("y", 80)
         .attr("dy", "1em")
-        .text("Note: State level demographic data is only available for 2019. All states must be deselected (click a selected state to deselect) in order to alter year selection.")
+        .text("Note: State level demographic data is only available for 2019. All states must be deselected (click a selected state to deselect) in order to alter year selection. Map view will default to 2019 data while any state is selected.")
         .call(wrap, message.attr("width"));
 
 }
