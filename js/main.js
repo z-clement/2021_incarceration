@@ -8,7 +8,7 @@ let nationalData = {};
 let statesClicked = [];
 // colors for the charts showing breakdowns by age & sex
 // first color will correspond to female, second will correspond to male
-const sexColors = ["hotpink", "blue"];
+const sexColors = ["hotpink", "dodgerblue"];
 // first color = juvenile, second color = adult
 const ageColors = ["darkorange", "green"];
 // global to store the x & y scaling functions for the race chart
@@ -387,8 +387,8 @@ function createStateSelect(svg) {
         .text("State 2: Select a 2nd state to compare!")
         .call(wrap, state2.attr("width"));
     let message = svg.append("svg")
-        .attr("transform", "translate(" + stateSelectWidth * 2 + "," + d3.select(".borderContainer").attr("height") + ")")
-        .attr("width", stateSelectWidth * 1.9)
+        .attr("transform", "translate(" + stateSelectWidth * 2.25 + "," + d3.select(".borderContainer").attr("height") + ")")
+        .attr("width", stateSelectWidth)
         .attr("height", svg.attr("height") - d3.select(".borderContainer").attr("height"));
     message.append("text")
         .attr("class", "message")
@@ -481,7 +481,7 @@ function clickState(event, d) {
         d3.select(".ageChart-title").text(oldTitle.replace("State", "National"));
         // update the scale of the person symbol
         let oldText = d3.select(".people-scale").text();
-        d3.select(".people-scale").text(oldText.replace("2 people", "1 person"));
+        d3.select(".people-scale").text(oldText.replace("2% inmates", "1% inmates"));
         // finally raceChart
         oldTitle = d3.select(".raceChart-title").text();
         d3.select(".raceChart-title").text(oldTitle.replace("State", "National"));
@@ -805,7 +805,7 @@ function renderStateCharts(statesClicked) {
     updatePeopleChart(stateData["ageData"], "age", ageColors);
     // update the scale of the person symbol
     let oldText = d3.select(".people-scale").text();
-    d3.select(".people-scale").text(oldText.replace("2 people", "1 person"));
+    d3.select(".people-scale").text(oldText.replace("2% inmates", "1% inmates"));
     // update the chart name to say "State"
     oldTitle = d3.select(".ageChart-title").text();
     d3.select(".ageChart-title").text(oldTitle.replace("National", "State"))
@@ -837,7 +837,7 @@ function renderComparisonCharts(statesClicked) {
             if ((i / 50) < state1Data["sexData"]["Female"]) {
                 symbol.style("fill", "hotpink"); // !!! state1 female fill color set here
             } else {
-                symbol.style("fill", "blue"); // !!! state1 male fill color set here
+                symbol.style("fill", "dodgerblue"); // !!! state1 male fill color set here
             }
         }
         // add a label for state1
@@ -863,7 +863,7 @@ function renderComparisonCharts(statesClicked) {
             if ((i / 50) < state2Data["sexData"]["Female"]) {
                 symbol.style("fill", "hotpink"); // !!! state2 female fill color set here
             } else {
-                symbol.style("fill", "blue"); // !!! state2 male fill color set here
+                symbol.style("fill", "dodgerblue"); // !!! state2 male fill color set here
             }
         }
         // select symbols 51-100 to use as state2
@@ -888,7 +888,7 @@ function renderComparisonCharts(statesClicked) {
     // update the scale of the person if 2 states are succesfully selected
     if (state1Data["totalIncarcerated"] && state2Data["totalIncarcerated"]) {
         let oldText = d3.select(".people-scale").text();
-        d3.select(".people-scale").text(oldText.replace("1 person", "2 people"));
+        d3.select(".people-scale").text(oldText.replace("1% inmates", "2% inmates"));
         // update the tooltip
         let oldTooltip = d3.select(".toolTip").html();
         d3.select("#bar1").html(state1 + ": ");
@@ -1005,7 +1005,7 @@ function sexLegend(svg, colors) {
         .attr("x", 23)
         .attr("y", legend.select("g").node().getBoundingClientRect().height * 3)
         .attr("dy", ".35em")
-        .text("= 1 person");
+        .text("= 1% inmates");
 }
 
 function ageLegend(svg, colors) {
