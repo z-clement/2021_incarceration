@@ -8,9 +8,9 @@ let nationalData = {};
 let statesClicked = [];
 // colors for the charts showing breakdowns by age & sex
 // first color will correspond to female, second will correspond to male
-const sexColors = ["pink", "blue"];
+const sexColors = ["hotpink", "blue"];
 // first color = juvenile, second color = adult
-const ageColors = ["green", "orange"];
+const ageColors = ["green", "darkorange"];
 // global to store the x & y scaling functions for the race chart
 let raceXScale;
 let raceYScale;
@@ -800,7 +800,7 @@ function renderComparisonCharts(statesClicked) {
         for (let i = 0; i < 50; i++) {
             let symbol = sexChart.select("#id" + i);
             if ((i / 50) < state1Data["sexData"]["Female"]) {
-                symbol.style("fill", "pink"); // !!! state1 female fill color set here
+                symbol.style("fill", "hotpink"); // !!! state1 female fill color set here
             } else {
                 symbol.style("fill", "blue"); // !!! state1 male fill color set here
             }
@@ -809,7 +809,7 @@ function renderComparisonCharts(statesClicked) {
         for (let i = 0; i < 50; i++) {
             let symbol = sexChart.select("#id" + (i + 50));
             if ((i / 50) < state2Data["sexData"]["Female"]) {
-                symbol.style("fill", "pink"); // !!! state2 female fill color set here
+                symbol.style("fill", "hotpink"); // !!! state2 female fill color set here
             } else {
                 symbol.style("fill", "blue"); // !!! state2 male fill color set here
             }
