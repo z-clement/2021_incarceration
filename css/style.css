@@ -9,6 +9,18 @@
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
+.state1-label {
+    font-weight: bold;
+}
+
+.state2-label {
+    font-weight: bold;
+}
+
+.y-axis-label {
+    font-size: small;
+}
+
 #BlackBar {
     fill: blueviolet;
 }

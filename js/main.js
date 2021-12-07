@@ -1,13 +1,7 @@
 // global variable for the color scale so all functions can access it once the data is loaded
 let colorScale;
 // global variables to determine the size of the map container, map image, & legend elements
-const width = 1000;
-const height = 800;
-const mapHeight = 600;
-const titleHeight = 30;
-const legendHeight = 150;
-const legendWidth = 200;
-const timeWidth = 200;
+const titleHeight = d3.select(".title").node().getBoundingClientRect().height;
 // global to store the national data so the csv doesn't have to be loaded every time our view changes
 let nationalData = {};
 // variable to track which states are clicked
@@ -21,8 +15,6 @@ const ageColors = ["green", "orange"];
 let raceXScale;
 let raceYScale;
 let raceHeight;
-// global variables to determine the size of the chart container
-const chartContainerW = 800;
 
 window.onload = function() {
     renderMap();
@@ -33,12 +25,25 @@ var numStatesClicked = 0
 
 // function to draw all the state borders
 function renderMap() {
-    // an svg container to hold the map
-    let svg = d3.select("body")
+    // margins so that the elements don't hit the borders of the screen
+    let margin = 20;
+    // svg container to hold all elements so they can be positioned relatively
+    let screenContainer = d3.select("body")
         .append("svg")
-        .attr("width", width)
-        .attr("height", height)
+        .attr("class", "container")
+        .attr("width", window.screen.width - margin * 2)
+        .attr("height", window.screen.height - margin * 2 - titleHeight)
+        .attr("translate", "transform(" + (margin * 2) + "," + (margin * 2 - titleHeight) + ")");
+    // an svg container to hold all of the elements related to the map
+    let mapContainer = screenContainer.append("svg")
+        .attr("width", 2 * screenContainer.attr("width") / 3)
+        .attr("height", screenContainer.attr("height"))
         .attr("class", "mapContainer");
+    // an svg container to hold the map
+    let svg = mapContainer.append("svg")
+        .attr("width", mapContainer.attr("width"))
+        .attr("height", 3 * Number(mapContainer.attr("height")) / 4)
+        .attr("class", "borderContainer");
 
     // load the national csv data
 
@@ -78,11 +83,11 @@ function renderMap() {
         // draw the state borders from the GeoJSON features
         drawStateBorders(svg, data, yearData);
         // create a legend with a title that corresponds to the data being mapped
-        createLegend(svg, yearData);
+        createLegend(mapContainer, yearData);
         // add svg to hold click boxes to change time scale
-        createTimeSelect(svg);
+        createTimeSelect(mapContainer);
         // create elements that display which states are selected
-        createStateSelect(svg);
+        createStateSelect(mapContainer);
     });
 }
 
@@ -123,10 +128,10 @@ function makeColorScale(data) {
 
 // draw the state borders on the webpage
 function drawStateBorders(svg, data, yearData) {
+    let width = svg.attr("width");
+    let height = svg.attr("height");
     // set the map projection to be Albers USA
-    let projection = d3.geoAlbersUsa()
-        .translate([width / 2, mapHeight / 2]) // center the map on the screen
-        .scale([1200]);
+    let projection = d3.geoAlbersUsa();
 
     // path generator to draw the borders of the states
     let path = d3.geoPath()
@@ -157,9 +162,9 @@ function createLegend(svg, yearData) {
     // container for the legend + legend title
     let legendContainer = svg.append("svg")
         .attr("class", "legend-container")
-        .attr("transform", "translate(0," + mapHeight + ")")
-        .attr("width", legendWidth)
-        .attr("height", 200);
+        .attr("transform", "translate(0," + d3.select(".borderContainer").attr("height") + ")")
+        .attr("width", svg.attr("width") / 4)
+        .attr("height", Number(svg.attr("height")) - Number(d3.select(".borderContainer").attr("height")));
 
     // text element that holds the title
     // tspan elements to make this multiline
@@ -180,7 +185,7 @@ function createLegend(svg, yearData) {
     // adapted from Mike Bostock: http://bl.ocks.org/mbostock/3888852
     let legend = legendContainer.append("svg")
         .attr("class", "legend")
-        .attr("height", legendHeight)
+        .attr("height", legendContainer.attr("height"))
         .attr("y", titleHeight)
         .selectAll("g")
         .data(colorScale.range().slice().reverse())
@@ -209,7 +214,7 @@ function createLegend(svg, yearData) {
     let extraBox = legendContainer.append("svg")
         .attr("class", "extra-box")
         .attr("height", 20)
-        .attr("y", legendHeight - 10);
+        .attr("y", (colorScale.range().length + 2.8) * 20);
     extraBox.append("rect")
         .attr("width", 18)
         .attr("height", 18)
@@ -225,9 +230,9 @@ function createLegend(svg, yearData) {
 function createTimeSelect(svg) {
     let timeContainer = svg.append("svg")
         .attr("class", "time-container")
-        .attr("transform", "translate(" + legendWidth + "," + mapHeight + ")")
-        .attr("width", timeWidth)
-        .attr("height", 200);
+        .attr("transform", "translate(" + d3.select(".legend-container").attr("width") + "," + d3.select(".borderContainer").attr("height") + ")")
+        .attr("width", svg.attr("width") / 4)
+        .attr("height", svg.attr("height") - d3.select(".borderContainer").attr("height"));
     // add a title to the time selector
     let timeTitle = timeContainer.append("text")
         .attr("class", "time-title")
@@ -238,7 +243,7 @@ function createTimeSelect(svg) {
     let timeData = ["2005", "2013", "2019"]
     let timeSelector = timeContainer.append("svg")
         .attr("class", "time-selector")
-        .attr("height", legendHeight)
+        .attr("height", Number(timeContainer.attr("height")) - 20)
         .attr("y", titleHeight)
         .selectAll("g")
         .data(timeData)
@@ -353,26 +358,34 @@ function updateBarChart(newData, barClass) {
 
 // create the part of the interface that shows what states are selected
 function createStateSelect(svg) {
-    let stateSelectWidth = (width - timeWidth - legendWidth) / 2;
+    let stateSelectWidth = svg.attr("width") / 4;
+    // create an svg element to hold the information for the first state
     let state1 = svg.append("svg")
-        .attr("transform", "translate(" + (timeWidth + legendWidth) + "," + mapHeight + ")")
+        .attr("transform", "translate(" + stateSelectWidth * 2 + "," + d3.select(".borderContainer").attr("height") + ")")
         .attr("width", stateSelectWidth)
-        .attr("height", legendHeight);
+        .attr("height", Number(svg.attr("height")) - Number(d3.select(".borderContainer").attr("height")));
+    // add text that says which state is selected
     state1.append("text")
         .attr("class", "state1")
         .attr("x", 30)
         .attr("y", 30)
-        .text("State 1: Click a state to select it!");
+        .attr("dy", "1em")
+        .text("State 1: Click a state to select it!")
+        .call(wrap, state1.attr("width"));
 
+    // create an svg element for the second state
     let state2 = svg.append("svg")
-        .attr("transform", "translate(" + (timeWidth + legendWidth + stateSelectWidth) + "," + mapHeight + ")")
+        .attr("transform", "translate(" + stateSelectWidth * 3 + "," + d3.select(".borderContainer").attr("height") + ")")
         .attr("width", stateSelectWidth)
-        .attr("height", legendHeight);
+        .attr("height", svg.attr("height") - d3.select(".borderContainer").attr("height"));
+    // add text that says which state is selected
     state2.append("text")
         .attr("class", "state2")
         .attr("x", 30)
         .attr("y", 30)
-        .text("State 2: Select a 2nd state to compare!");
+        .attr("dy", "1em")
+        .text("State 2: Select a 2nd state to compare!")
+        .call(wrap, state2.attr("width"));
 }
 
 // highlight state on click logic
@@ -415,14 +428,14 @@ function clickState(event, d) {
     }
 
     d3.select(".state1")
-        .text("State 1: " + state1Text);
+        .text("State 1: " + state1Text)
+        .call(wrap, d3.select(".legend-container").attr("width")); // this works because all the elements on the bottom of the map are the same width
 
     d3.select(".state2")
-        .text("State 2: " + state2Text);
+        .text("State 2: " + state2Text)
+        .call(wrap, d3.select(".legend-container").attr("width"));
 
     // logic for updating the graphs depending on how many states are clicked
-    // if there's only one state, update the graphs to show the state's data
-    // make sure the map is set to show 2019 data
     // deselect the current year that is selected
     d3.select("#selected")
         .attr("id", "");
@@ -447,17 +460,34 @@ function clickState(event, d) {
         renderComparisonCharts(statesClicked);
     } else {
         changeYear(null, "2019");
+        // update the chart names to say "National"
+        // first sexChart
+        let oldTitle = d3.select(".sexChart-title").text();
+        d3.select(".sexChart-title")
+            .text(oldTitle.replace("State", "National"))
+            .call(wrap, d3.select(".sexChart"));
+        // now ageChart
+        oldTitle = d3.select(".ageChart-title").text();
+        d3.select(".ageChart-title").text(oldTitle.replace("State", "National"));
+        // finally raceChart
+        oldTitle = d3.select(".raceChart-title").text();
+        d3.select(".raceChart-title").text(oldTitle.replace("State", "National"));
+        // make sure the state comparison labels aren't showing
+        d3.selectAll(".state1-label").text("");
+        d3.selectAll(".state2-label").text("");
     }
 }
 
 
 // render the national charts
 function renderNationalCharts() {
+    let screenContainer = d3.select(".container");
+    let mapContainer = d3.select(".mapContainer");
     // create a container for the charts
-    let svg = d3.select("body")
-        .append("svg")
-        .attr("width", chartContainerW)
-        .attr("height", height)
+    let svg = screenContainer.append("svg")
+        .attr("height", screenContainer.attr("height"))
+        .attr("width", screenContainer.attr("width") / 3)
+        .attr("transform", "translate(" + mapContainer.attr("width") + ",0)")
         .attr("class", "chartContainer");
     //define icon paths for the charts shown using people as icons
     let person = svg.append("defs")
@@ -491,18 +521,18 @@ function renderNationalCharts() {
         // render each chart
         // create svg containers for each of the 4 charts that are stacked
         let sexContainer = svg.append("svg")
-            .attr("width", chartContainerW - 200)
-            .attr("height", height / 3)
+            .attr("width", 3 * svg.attr("width") / 4)
+            .attr("height", svg.attr("height") / 3)
             .attr("class", "sexChart");
         let ageContainer = svg.append("svg")
-            .attr("width", chartContainerW - 200)
-            .attr("height", height / 3)
-            .attr("transform", "translate(0," + height / 3 + ")")
+            .attr("width", 3 * svg.attr("width") / 4)
+            .attr("height", svg.attr("height") / 3)
+            .attr("transform", "translate(0," + svg.attr("height") / 3 + ")")
             .attr("class", "ageChart");
         let raceContainer = svg.append("svg")
-            .attr("width", chartContainerW)
-            .attr("height", height / 3)
-            .attr("transform", "translate(0," + 2 * height / 3 + ")")
+            .attr("width", svg.attr("width"))
+            .attr("height", svg.attr("height") / 3)
+            .attr("transform", "translate(0," + 2 * svg.attr("height") / 3 + ")")
             .attr("class", "raceChart");
 
         // chart for sex
@@ -555,7 +585,7 @@ function getNationalDataForYear(year) {
 // function to draw the race chart onto the given container
 function renderRaceChart(raceData, raceContainer) {
     // create a margin so that labels, etc. fit on the chart
-    let margin = { top: 20, right: 20, bottom: 40, left: 70 };
+    let margin = { top: 25, right: 20, bottom: 40, left: 40 };
     // set the width & height of the actual chart
     let raceWidth = raceContainer.attr("width") - margin.left - margin.right;
     raceHeight = raceContainer.attr("height") - margin.top - margin.bottom;
@@ -582,12 +612,14 @@ function renderRaceChart(raceData, raceContainer) {
     // create the y axis
     g.append("g")
         .attr("class", "axis axis--y")
-        .call(d3.axisLeft(raceYScale).ticks(10))
-        .append("text")
+        .call(d3.axisLeft(raceYScale).ticks(10));
+    g.append("text")
+        .attr("class", "y-axis-label")
         .attr("transform", "rotate(-90)")
-        .attr("y", 6)
+        .attr("y", -g.select(".axis--y").node().getBoundingClientRect().width - 10)
         .attr("dy", "0.71em")
-        .attr("text-anchor", "end");
+        .attr("text-anchor", "end")
+        .text("Percent of Incarcerated People");
 
     // create the actual bars on the chart based on our data
     // two bars are used here so that we can change one bar to represent different data when a state is selected
@@ -610,6 +642,15 @@ function renderRaceChart(raceData, raceContainer) {
         .attr("width", raceXScale.bandwidth() / 2 - 0.5) // make one bar only take up half the width
         .attr("height", function(d) { return raceHeight - raceYScale(raceData[d]); })
         .attr("id", function(d) { return d.replaceAll(" ", "_").replace("/", "_") + "Bar" });
+
+    // add a title to the race chart
+    let title = raceContainer.append("svg")
+        .attr("transform", "translate(20,0)")
+        .attr("height", margin.top - 10)
+        .append("text")
+        .attr("class", "raceChart-title")
+        .attr("y", margin.top / 2)
+        .text("National Breakdown of Incarceration Data by Race");
 }
 
 // function to separate long axis labels into multiline tspans (from Mike Bostock: https://bl.ocks.org/mbostock/7555321)
@@ -644,7 +685,7 @@ function renderPeopleChart(data, container, colors) {
     let numRows = 10;
     let numCols = 10;
     // variables to control the spacing of the chart
-    let margin = { top: 20, right: 20, bottom: 30, left: 70 };
+    let margin = { top: 20, right: 0, bottom: 30, left: 70 };
     let chartWidth = container.attr("width") - margin.left - margin.right;
     let chartHeight = container.attr("height") - margin.top - margin.bottom;
 
@@ -670,7 +711,7 @@ function renderPeopleChart(data, container, colors) {
     let gridData = d3.range(numCols * numRows);
     //grid container - controls where grid is in element
     var gridContainer = container.append("g")
-        .attr("transform", "translate(20,20)");
+        .attr("transform", "translate(20,40)");
 
     gridContainer.selectAll("use")
         .data(gridData)
@@ -687,6 +728,24 @@ function renderPeopleChart(data, container, colors) {
             }
         });
     // !!! add mouseover event for the people charts
+
+    // add a title to the top of the svg
+    // text for the title comes from the container
+    let titleText;
+    if (container.attr("class") == "sexChart") {
+        // if the chart is showing the breakdown by sex
+        titleText = "National Breakdown of Incarceration Data by Sex";
+    } else if (container.attr("class") == "ageChart") {
+        titleText = "National Breakdown of Incarceration Data by Age";
+    }
+
+    let title = container.append("svg")
+        .attr("transform", "translate(20, 20)")
+        .attr("height", "20")
+        .append("text")
+        .attr("class", container.attr("class") + "-title")
+        .attr("y", "15")
+        .text(titleText);
 }
 
 // render state charts for selected state
@@ -695,12 +754,24 @@ function renderStateCharts(statesClicked) {
     let stateName = statesClicked[0];
     // get the clean incarceration data
     let stateData = cleanStateData(stateName);
+    // make sure the state comparison labels aren't showing
+    d3.selectAll(".state1-label").text("");
+    d3.selectAll(".state2-label").text("");
     // call the update chart functions with the state data
     updatePeopleChart(stateData["sexData"], "sex", sexColors);
+    // update the chart name to say "State"
+    let oldTitle = d3.select(".sexChart-title").text();
+    d3.select(".sexChart-title").text(oldTitle.replace("National", "State"))
     updatePeopleChart(stateData["ageData"], "age", ageColors);
+    // update the chart name to say "State"
+    oldTitle = d3.select(".ageChart-title").text();
+    d3.select(".ageChart-title").text(oldTitle.replace("National", "State"))
     updateBarChart(stateData["raceData"], "bar"); // update half the bars
     updateBarChart(stateData["raceData"], "bar1"); // update the other half
     changeBarOpacity("bar", 1); // make sure the bars are all colored the same
+    // update the race chart name to say "State"
+    oldTitle = d3.select(".raceChart-title").text();
+    d3.select(".raceChart-title").text(oldTitle.replace("National", "State"))
 }
 
 // render comparison charts
@@ -731,6 +802,9 @@ function renderComparisonCharts(statesClicked) {
                 symbol.style("fill", "blue"); // !!! state2 male fill color set here
             }
         }
+        // add a label for state1
+        d3.selectAll(".state1-label").text(state1)
+            .call(wrap, d3.select(".sexlegend-container").attr("width"));
 
         // split the age chart in half, 50 people to represent each state
         let ageChart = d3.select(".ageChart").select("g");
@@ -752,6 +826,9 @@ function renderComparisonCharts(statesClicked) {
                 symbol.style("fill", ageColors[1]); // !!! state2 adult fill color set here
             }
         }
+        // add a label for the state2
+        d3.selectAll(".state2-label").text(state2)
+            .call(wrap, d3.select(".sexlegend-container").attr("width"));
 
         // edit the bar chart so all bars with class .bar are state2, and all .bar1 are state1
         updateBarChart(state2Data["raceData"], "bar"); // update half the bars
@@ -801,18 +878,39 @@ function changeBarOpacity(barClass, opacity) {
 }
 
 function sexLegend(svg, colors) {
+    let chartWidth = svg.select(".sexChart").attr("width");
+    let chartHeight = svg.select(".sexChart").attr("height");
     // container for the legend + legend title
     let legendContainer = svg.append("svg")
         .attr("class", "sexlegend-container")
-        .attr("transform", "translate(" + (chartContainerW - 200) + ",0)")
-        .attr("width", legendWidth)
-        .attr("height", 200);
+        .attr("transform", "translate(" + (chartWidth - 40) + ",40)")
+        .attr("width", svg.attr("width") - chartWidth - 20)
+        .attr("height", chartHeight);
+
+    // add two labels for the state comparison that initially are blank
+    let state1Label = legendContainer.append("svg")
+        .attr("height", chartHeight / 3)
+        .append("text")
+        .attr("class", "state1-label")
+        .attr("y", 1)
+        .attr("dy", "1em")
+        .text("");
+    // add two labels for the state comparison that initially are blank
+    let state2Label = legendContainer.append("svg")
+        .attr("height", chartHeight / 3)
+        .attr("y", chartHeight / 3)
+        .append("text")
+        .attr("class", "state2-label")
+        .attr("y", 21)
+        .attr("dy", "1em")
+        .text("");
 
     // add an svg legend for the initial data
     // adapted from Mike Bostock: http://bl.ocks.org/mbostock/3888852
     let legend = legendContainer.append("svg")
         .attr("class", "legend")
-        .attr("height", legendHeight)
+        .attr("height", chartHeight / 3)
+        .attr("y", 2 * chartHeight / 3 - 15)
         .selectAll("g")
         .data(["Male", "Female"])
         .enter().append("g")
@@ -838,22 +936,42 @@ function sexLegend(svg, colors) {
         .text(function(d) {
             return d;
         });
-
 }
 
 function ageLegend(svg, colors) {
+    let chartWidth = svg.select(".ageChart").attr("width");
+    let chartHeight = svg.select(".ageChart").attr("height");
     // container for the legend + legend title
     let legendContainer = svg.append("svg")
-        .attr("class", "sexlegend-container")
-        .attr("transform", "translate(" + (chartContainerW - 200) + ",300)")
-        .attr("width", legendWidth)
-        .attr("height", 200);
+        .attr("class", "agelegend-container")
+        .attr("transform", "translate(" + (chartWidth - 40) + "," + (40 + Number(svg.select(".sexlegend-container").attr("height"))) + ")")
+        .attr("width", svg.attr("width") - chartWidth - 20)
+        .attr("height", chartHeight);
+
+    // add two labels for the state comparison that initially are blank
+    let state1Label = legendContainer.append("svg")
+        .attr("height", chartHeight / 3)
+        .append("text")
+        .attr("class", "state1-label")
+        .attr("y", 1)
+        .attr("dy", "1em")
+        .text("");
+    // add two labels for the state comparison that initially are blank
+    let state2Label = legendContainer.append("svg")
+        .attr("height", chartHeight / 3)
+        .attr("y", chartHeight / 3)
+        .append("text")
+        .attr("class", "state2-label")
+        .attr("y", 21)
+        .attr("dy", "1em")
+        .text("");
 
     // add an svg legend for the initial data
     // adapted from Mike Bostock: http://bl.ocks.org/mbostock/3888852
     let legend = legendContainer.append("svg")
         .attr("class", "legend")
-        .attr("height", legendHeight)
+        .attr("height", chartHeight)
+        .attr("y", 2 * chartHeight / 3 - 15)
         .selectAll("g")
         .data(["Adult", "Juvenile"])
         .enter().append("g")
@@ -879,5 +997,4 @@ function ageLegend(svg, colors) {
         .text(function(d) {
             return d;
         });
-
 }
