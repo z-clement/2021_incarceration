@@ -146,7 +146,7 @@ function drawStateBorders(svg, data, yearData) {
         .on("click", function(event, d) {
             clickState(event, d);
         })
-        .style("stroke", "#000")
+        .style("stroke", "white")
         .style("stroke-width", "1")
         .style("fill", function(d) {
             // get the color from the scale based on the scaleQuantize function
