@@ -328,6 +328,11 @@ function updatePeopleChart(newData, chartName, colors) {
                 return colors[1];
             }
         });
+    let toolTipText = getPeopleToolTip(newData, key);
+    let container1 = d3.select("." + chartName + "Chart").select("rect.container1");
+    let container2 = d3.select("." + chartName + "Chart").select("rect.container2");
+    container1.attr("toolTip", toolTipText);
+    container2.attr("toolTip", toolTipText);
 }
 
 // function to update the bar chart when the year is changed
@@ -681,7 +686,7 @@ function renderRaceChart(raceData, raceContainer) {
                 .style("display", "inline-block")
                 .html(stateName + percentage + "% " + d);
         })
-        .on("mouseout", function(d) { raceTooltip.style("display", "none"); });;
+        .on("mouseout", function(d) { raceTooltip.style("display", "none"); });
 
     // add a title to the race chart
     let title = raceContainer.append("svg")
@@ -749,6 +754,10 @@ function renderPeopleChart(data, container, colors) {
         .domain(d3.range(numCols));
 
     let gridData = d3.range(numCols * numRows);
+
+    // create a tooltip for hover
+    let peopleTooltip = d3.select("body").append("div").attr("class", "toolTip").attr("id", container.attr("class"));
+
     //grid container - controls where grid is in element
     var gridContainer = container.append("g")
         .attr("transform", "translate(20,40)");
@@ -767,7 +776,6 @@ function renderPeopleChart(data, container, colors) {
                 return colors[1];
             }
         });
-    // !!! add mouseover event for the people charts
 
     // add a title to the top of the svg
     // text for the title comes from the container
@@ -786,6 +794,54 @@ function renderPeopleChart(data, container, colors) {
         .attr("class", container.attr("class") + "-title")
         .attr("y", "15")
         .text(titleText);
+
+    // split the chart container into two invisible containers that'll show the data on hover
+    let container1 = container.append("rect")
+        .attr("class", "container1")
+        .attr("x", 20)
+        .attr("y", 40)
+        .attr("height", container.select("#id11").attr("y") * 5)
+        .attr("width", container.select("#id11").attr("x") * 10)
+        .attr("toolTip", getPeopleToolTip(data, key))
+        .style("fill", "transparent")
+        .on("mouseover", function(event, d) {
+            let toolTipText = d3.select(this).attr("toolTip");
+            peopleTooltip.style("left", event.pageX - 50 + "px")
+                .style("top", event.pageY - 70 + "px")
+                .style("display", "inline-block")
+                .html(toolTipText);
+        })
+        .on("mouseout", function(d) { peopleTooltip.style("display", "none"); });;
+
+    let container2 = container.append("rect")
+        .attr("class", "container2")
+        .attr("x", 20)
+        .attr("y", 40 + container.select("#id11").attr("y") * 5)
+        .attr("height", container.select("#id11").attr("y") * 5)
+        .attr("width", container.select("#id11").attr("x") * 10)
+        .attr("toolTip", getPeopleToolTip(data, key))
+        .style("fill", "transparent")
+        .on("mouseover", function(event, d) {
+            let toolTipText = d3.select(this).attr("toolTip");
+            peopleTooltip.style("left", event.pageX - 50 + "px")
+                .style("top", event.pageY - 70 + "px")
+                .style("display", "inline-block")
+                .html(toolTipText);
+        })
+        .on("mouseout", function(d) { peopleTooltip.style("display", "none"); });;
+}
+
+// get the information needed for the mouseover function on the person charts
+function getPeopleToolTip(data, key) {
+    let percentage = Math.round(10000 * data[key]) / 100;
+    let otherKey;
+    if (key == "Female") {
+        otherKey = "Male";
+    } else {
+        otherKey = "Adult";
+    }
+
+    return key + ": " + percentage + "% " + otherKey + ": " + (100 - percentage) + "%";
 }
 
 // render state charts for selected state
@@ -853,6 +909,16 @@ function renderComparisonCharts(statesClicked) {
                 symbol.style("fill", ageColors[1]); // !!! state1 adult fill color set here
             }
         }
+        // update the toolTip info for state1 sex
+        let toolTipText = getPeopleToolTip(state1Data["sexData"], "Female");
+        let container1 = d3.select(".sexChart").select("rect.container1");
+        container1.attr("toolTip", "<b>" + state1 + "</b> " + toolTipText);
+
+        // update tooltip info for state1 age
+        toolTipText = getPeopleToolTip(state1Data["ageData"], "Juvenile");
+        container1 = d3.select(".ageChart").select("rect.container1");
+        container1.attr("toolTip", "<b>" + state1 + "</b> " + toolTipText);
+
         // edit the bar chart so all bars with class .bar are state2, and all .bar1 are state1
         updateBarChart(state1Data["raceData"], "bar1");
     }
@@ -878,6 +944,16 @@ function renderComparisonCharts(statesClicked) {
         // add a label for the state2
         d3.selectAll(".state2-label").text(state2)
             .call(wrap, d3.select(".sexlegend-container").attr("width"));
+
+        // update the tooltip for state2 sex
+        let toolTipText = getPeopleToolTip(state2Data["sexData"], "Female");
+        let container2 = d3.select(".sexChart").select("rect.container2");
+        container2.attr("toolTip", "<b>" + state2 + "</b> " + toolTipText);
+
+        // update the tooltip for state2 age
+        toolTipText = getPeopleToolTip(state2Data["ageData"], "Juvenile");
+        container2 = d3.select(".ageChart").select("rect.container2");
+        container2.attr("toolTip", "<b>" + state2 + "</b> " + toolTipText);
 
         // edit the bar chart so all bars with class .bar are state2, and all .bar1 are state1
         updateBarChart(state2Data["raceData"], "bar"); // update half the bars
