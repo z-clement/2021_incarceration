@@ -244,20 +244,20 @@ function createTimeSelect(svg) {
     let timeSelector = timeContainer.append("svg")
         .attr("class", "time-selector")
         .attr("height", Number(timeContainer.attr("height")) - 20)
-        .attr("y", titleHeight)
+        .attr("y", timeTitle.node().getBoundingClientRect().height + 5)
         .selectAll("g")
         .data(timeData)
         .enter().append("g")
         .attr("transform", function(d, i) {
             return "translate(1," + (10 + i * 20) + ")";
         });
-    timeSelector.append("rect") // !!! we should change these to not be squares like the legend, make it look clickable
-        .attr("width", 18)
-        .attr("height", 18)
+    timeSelector.append("circle")
+        .attr("r", 9)
+        .attr("cx", 9)
+        .attr("cy", 8.5)
         .attr("class", function(d) { return "y" + d })
-        .style("outline-style", "solid")
-        .style("outline-width", "thin")
-        .style("outline-offset", "-1px")
+        .style("stroke", "black")
+        .style("stroke-width", "thin")
         .style("fill", "white")
         .on("click", function(event, d) {
             // only update the year if there are no states clicked
