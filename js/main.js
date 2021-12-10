@@ -35,7 +35,8 @@ function renderDisclaimer() {
         .attr("class", "popup")
         .append("span")
         .attr("class", "popupText")
-        .text("He couldn't remember exactly where he had read it, but he was sure that he had. The fact that she didn't believe him was quite frustrating as he began to search the Internet to find the article. It wasn't as if it was something that seemed impossible. Yet she insisted on always seeing the source whenever he stated a fact.");
+        .text('Disclaimer: Disproportionate incarceration of certain populations is a major problem in the United States. To learn more about this issue please visit The Sentencing Project and read about "The Color of Progress." Please note that the demographic data presented in this visualization is not calculated on a per capita basis due to the unavailability of necessary data. Therefore, data will likely be reflective of the size of various populations in each state and should not be used to draw conclusions about disproportionate incarceration. Thank you to the Bureau of Justice Statistics for their Census of Jails publication from which our data is drawn.')
+        .on("click", function() { window.open("http://google.com"); }); // when clicked, opens window with google.com.
 }
 
 // function to call when the pop up needs to be shown
@@ -117,11 +118,11 @@ function renderMap() {
 function makeColorScale(data) {
     let stateKeys = ["2005_incarceration_rate", "2013_incarceration_rate", "2019_incarceration_rate"];
     let colorClasses = [
-        "#fef0d9",
-        "#fdcc8a",
-        "#fc8d59",
-        "#e34a33",
-        "#b30000"
+        "#fee5d9",
+        "#fcae91",
+        "#fb6a4a",
+        "#de2d26",
+        "#a50f15"
     ];
 
     let domainArray = [];
@@ -1103,7 +1104,7 @@ function sexLegend(svg, colors) {
         .attr("x", 23)
         .attr("y", legend.select("g").node().getBoundingClientRect().height * 3)
         .attr("dy", ".35em")
-        .text("= 1% inmates");
+        .text("≈ 1% inmates");
 }
 
 function ageLegend(svg, colors) {
