@@ -17,11 +17,33 @@ let raceYScale;
 let raceHeight;
 
 window.onload = function() {
+    renderDisclaimer();
     renderMap();
     renderNationalCharts();
+    showPopUp()
 }
 
 var numStatesClicked = 0
+
+// function that creates a popup window with all the disclaimer info, as well as links to the data sources
+function renderDisclaimer() {
+    // add the popup functionality to the title for now
+    d3.select(".title").on("click", function(d) {
+        showPopUp();
+    })
+    let popup = d3.select("body").append("div")
+        .attr("class", "popup")
+        .append("span")
+        .attr("class", "popupText")
+        .text("He couldn't remember exactly where he had read it, but he was sure that he had. The fact that she didn't believe him was quite frustrating as he began to search the Internet to find the article. It wasn't as if it was something that seemed impossible. Yet she insisted on always seeing the source whenever he stated a fact.");
+}
+
+// function to call when the pop up needs to be shown
+function showPopUp() {
+    let popup = d3.select(".popupText");
+    popup.classed("show", !popup.classed("show"));
+
+}
 
 // function to draw all the state borders
 function renderMap() {
