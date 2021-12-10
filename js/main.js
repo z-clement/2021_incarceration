@@ -36,7 +36,7 @@ function renderDisclaimer() {
         .append("span")
         .attr("class", "popupText")
         .text('Disclaimer: Disproportionate incarceration of certain populations is a major problem in the United States. To learn more about this issue please visit The Sentencing Project and read about "The Color of Progress." Please note that the demographic data presented in this visualization is not calculated on a per capita basis due to the unavailability of necessary data. Therefore, data will likely be reflective of the size of various populations in each state and should not be used to draw conclusions about disproportionate incarceration. Thank you to the Bureau of Justice Statistics for their Census of Jails publication from which our data is drawn.')
-        .on("click", function() { window.open("http://google.com"); }); // when clicked, opens window with google.com.
+        //.on("click", function() { window.open("http://google.com"); }); // when clicked, opens window with google.com.
 }
 
 // function to call when the pop up needs to be shown
