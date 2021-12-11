@@ -129,7 +129,11 @@ text {
 .popup .show {
     visibility: visible;
 }
-.popupText
-{
+
+.popupText {
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.container1 .contianer2 {
+    stroke-width: 0.5;
 }

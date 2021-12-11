@@ -330,7 +330,9 @@ function updatePeopleChart(newData, chartName, colors) {
     let container1 = d3.select("." + chartName + "Chart").select("rect.container1");
     let container2 = d3.select("." + chartName + "Chart").select("rect.container2");
     container1.attr("toolTip", toolTipText);
+    container1.attr("stroke", "");
     container2.attr("toolTip", toolTipText);
+    container2.attr("stroke", "");
 }
 
 // function to update the bar chart when the year is changed
@@ -911,11 +913,15 @@ function renderComparisonCharts(statesClicked) {
         let toolTipText = getPeopleToolTip(state1Data["sexData"], "Female");
         let container1 = d3.select(".sexChart").select("rect.container1");
         container1.attr("toolTip", "<b>" + state1 + "</b> " + toolTipText);
+        // add a box around container1
+        container1.attr("stroke", "black");
 
         // update tooltip info for state1 age
         toolTipText = getPeopleToolTip(state1Data["ageData"], "Juvenile");
         container1 = d3.select(".ageChart").select("rect.container1");
         container1.attr("toolTip", "<b>" + state1 + "</b> " + toolTipText);
+        // add a box around container1
+        container1.attr("stroke", "black");
 
         // edit the bar chart so all bars with class .bar are state2, and all .bar1 are state1
         updateBarChart(state1Data["raceData"], "bar1");
@@ -947,11 +953,15 @@ function renderComparisonCharts(statesClicked) {
         let toolTipText = getPeopleToolTip(state2Data["sexData"], "Female");
         let container2 = d3.select(".sexChart").select("rect.container2");
         container2.attr("toolTip", "<b>" + state2 + "</b> " + toolTipText);
+        // add a box around container2
+        container2.attr("stroke", "black");
 
         // update the tooltip for state2 age
         toolTipText = getPeopleToolTip(state2Data["ageData"], "Juvenile");
         container2 = d3.select(".ageChart").select("rect.container2");
         container2.attr("toolTip", "<b>" + state2 + "</b> " + toolTipText);
+        // add a box around container2
+        container2.attr("stroke", "black");
 
         // edit the bar chart so all bars with class .bar are state2, and all .bar1 are state1
         updateBarChart(state2Data["raceData"], "bar"); // update half the bars
